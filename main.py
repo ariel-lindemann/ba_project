@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 import detect
-from camera_calibration import calibrate_camera, undistort, is_calibrated
+from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
 from alignment import align
 from positioning import assess_position
 
