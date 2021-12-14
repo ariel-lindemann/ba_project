@@ -1,0 +1,1 @@
+The images from `calibration_images` with the calibration pattern drawn.
