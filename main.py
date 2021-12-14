@@ -52,6 +52,9 @@ def main():
     while True:
         success, img = cap.read()
 
+        if not success:
+            raise RuntimeError('Image capture unsuccessful')
+
         undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
         data, found = detect.find_markers(img, marker_type)  # boxes and IDs of found markers
