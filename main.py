@@ -11,8 +11,9 @@ STD_WAIT = 5
 MARKER_TYPE = 'aruco'
 DEFAULT_MARKER_SIZE = 4
 TOLERANCE = 0
-PARAMS_DIR = 'camera_parameters'
-TEMPLATE_IMG_PATH = 'alignment_templates/template.png'
+DATA_DIR = 'data'
+PARAMS_DIR = f'{DATA_DIR}/camera_parameters'
+TEMPLATE_IMG_PATH = f'{DATA_DIR}/alignment_templates/template.png'
 
 REQUIRED_POSITION = np.array([[100, 100], [800, 100], [800, 550], [100, 550]], np.int32)
 
