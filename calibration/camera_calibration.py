@@ -4,9 +4,10 @@ import numpy as np
 import os
 import glob
 
-CALIBRATION_IMGS_PATH = 'calibration_images'
-CALIBRATION_RES = 'calibration_results'
-PARAMS_DIR = 'camera_parameters'
+DATA_DIR = "data"
+CALIBRATION_IMGS_PATH = f'{DATA_DIR}/calibration_images'
+CALIBRATION_RES = f'{DATA_DIR}/calibration_results'
+PARAMS_DIR = f'{DATA_DIR}/camera_parameters'
 
 
 def calibrate_camera(imgs_path=CALIBRATION_IMGS_PATH):
