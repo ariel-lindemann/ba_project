@@ -4,10 +4,7 @@ import numpy as np
 import os
 import glob
 
-DATA_DIR = "data"
-CALIBRATION_IMGS_PATH = f'{DATA_DIR}/calibration_images'
-CALIBRATION_RES = f'{DATA_DIR}/calibration_results'
-PARAMS_DIR = f'{DATA_DIR}/camera_parameters'
+from defaults import CALIBRATION_IMGS_PATH, CALIBRATION_RESULTS_PATH, PARAMS_DIR
 
 
 def calibrate_camera(imgs_path=CALIBRATION_IMGS_PATH):
@@ -37,7 +34,7 @@ def calibrate_camera(imgs_path=CALIBRATION_IMGS_PATH):
             # Draw and display the corners
             cv2.drawChessboardCorners(img, (9, 6), corners2, ret)
             new_name = fname.split('/')[1]
-            cv2.imwrite(f'{CALIBRATION_RES}/{new_name}', img)
+            cv2.imwrite(f'{CALIBRATION_RESULTS_PATH}/{new_name}', img)
     cv2.destroyAllWindows()
 
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)

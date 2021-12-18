@@ -6,14 +6,7 @@ from calibration.camera_calibration import calibrate_camera, undistort, is_calib
 from alignment import align
 from positioning import assess_position
 
-CAMERA_NUMBER = 0
-STD_WAIT = 5
-MARKER_TYPE = 'aruco'
-DEFAULT_MARKER_SIZE = 4
-TOLERANCE = 0
-DATA_DIR = 'data'
-PARAMS_DIR = f'{DATA_DIR}/camera_parameters'
-TEMPLATE_IMG_PATH = f'{DATA_DIR}/alignment_templates/template.png'
+from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, TEMPLATE_IMG_PATH, STD_WAIT
 
 REQUIRED_POSITION = np.array([[100, 100], [800, 100], [800, 550], [100, 550]], np.int32)
 
