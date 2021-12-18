@@ -1,6 +1,6 @@
 import numpy as np
 
-TOLERANCE = 0
+from defaults import TOLERANCE
 
 # TODO fix
 def assess_position(required, actual, tolerance=TOLERANCE):

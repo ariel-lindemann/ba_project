@@ -3,8 +3,7 @@ from numpy.core.fromnumeric import shape
 import cv2.aruco as aruco
 import numpy as np
 
-DEFAULT_MARKER_SIZE = 4
-
+from defaults import DEFAULT_MARKER_SIZE
 
 def find_aruco_markers(img, marker_size=DEFAULT_MARKER_SIZE, total_markers=250, draw=True):
     img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
