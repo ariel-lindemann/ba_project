@@ -156,5 +156,5 @@ undistorted.png
 */calibration_matrix.npy
 */distortion_coefficients.npy
 
-calibration_images/*.jpg
-calibration_results/*.jpg
+data/calibration_images/*.jpg
+data/calibration_results/*.jpg
