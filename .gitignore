@@ -153,8 +153,7 @@ notes.md
 undistorted.png
 
 # Camera Parameters
-*/calibration_matrix.npy
-*/distortion_coefficients.npy
+data/camera_parameters/*.npy
 
 data/calibration_images/*.jpg
 data/calibration_results/*.jpg
