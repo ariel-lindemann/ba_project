@@ -35,7 +35,7 @@ def main():
     camera_calibrated = is_calibrated()
 
     if not camera_calibrated:
-        calibrate_camera()
+        calibrate_camera(with_video=True)
 
     cal_mtx = np.load(f'{PARAMS_DIR}/calibration_matrix.npy')
     dist_mtx = np.load(f'{PARAMS_DIR}/distortion_coefficients.npy')

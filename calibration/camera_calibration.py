@@ -4,13 +4,25 @@ import numpy as np
 import os
 import glob
 
-from defaults import CALIBRATION_IMGS_PATH, CALIBRATION_RESULTS_PATH, PARAMS_DIR
+from defaults import CALIBRATION_IMGS_PATH, CALIBRATION_RESULTS_PATH, CAMERA_NUMBER, PARAMS_DIR, CALIBRATION_IMGS_FORMAT
 
 
-def calibrate_camera(imgs_path=CALIBRATION_IMGS_PATH):
+def calibrate_camera(with_video=True, imgs_path=CALIBRATION_IMGS_PATH):
     """
     Calibrate camera using images in the given path
+
+    Parameters
+    ------------
+
+    with_video: bool
+        if True, then the calibration images will be taken from the camera feed. 
+        Otherwise they will be read from the calibraition images path
+
+    imgs_path: String, optional
+        where to look for calibration images (relative path). Only needed if `with_video` is False.
     """
+    if with_video:
+        produce_calibration_images()
 
     # termination criteria
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -20,7 +32,7 @@ def calibrate_camera(imgs_path=CALIBRATION_IMGS_PATH):
     # Arrays to store object points and image points from all the images.
     objpoints = []  # 3d point in real world space
     imgpoints = []  # 2d points in image plane.
-    images = glob.glob(f'{imgs_path}/*.jpg')
+    images = glob.glob(f'{imgs_path}/*.{CALIBRATION_IMGS_FORMAT}')
     for fname in images:
         img = cv2.imread(fname)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -33,7 +45,8 @@ def calibrate_camera(imgs_path=CALIBRATION_IMGS_PATH):
             imgpoints.append(corners)
             # Draw and display the corners
             cv2.drawChessboardCorners(img, (9, 6), corners2, ret)
-            new_name = fname.split('/')[1]
+            n = fname.split('/')
+            new_name = n[len(n) - 1]
             cv2.imwrite(f'{CALIBRATION_RESULTS_PATH}/{new_name}', img)
     cv2.destroyAllWindows()
 
@@ -48,6 +61,34 @@ def calibrate_camera(imgs_path=CALIBRATION_IMGS_PATH):
     return ret, mtx, dist, rvecs, tvecs
 
 
+def produce_calibration_images(amount=15, format=CALIBRATION_IMGS_FORMAT):
+    """
+    Produces `amount` number of images from camera feed in the specified format and stores them in the calibration images directory.
+    """
+
+    cap = cv2.VideoCapture(CAMERA_NUMBER)
+    
+    rate = 50
+    time = rate * amount
+    img_no = 0
+
+    for i in range(time):
+
+        success, img = cap.read()
+
+        if not success:
+            raise RuntimeError('Camera capture unsuccessful')
+
+        img_with_text = img
+        cv2.imshow('Calibration', img_with_text)
+
+        # TODO better condition
+        if i%rate == 0:
+            cv2.imwrite(f'{CALIBRATION_IMGS_PATH}/cal_img_{img_no}.{format}', img)
+            print(f'Calibrating... {amount - img_no} more to go')
+            img_no += 1
+
+# TODO fix
 def undistort(img, cal_mtx, dist, alpha=1.0):
     """Reverse distortion based on intrinsic parameters
 
@@ -93,7 +134,7 @@ def calc_reprojection_err(objpoints, imgpoints, mtx, dist, rvecs, tvecs):
 def is_calibrated():
     '''Checks if the camera is calibrated (if camera parameters are present)'''
     params_dir = os.listdir(PARAMS_DIR)
-    if len(params_dir) == 0:
+    if len(params_dir) <= 1:
         return False
     else:
         return True
