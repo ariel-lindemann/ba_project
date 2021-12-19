@@ -1,4 +1,3 @@
-# TODO read from config file
 CAMERA_NUMBER = 0
 STD_WAIT = 5
 
