@@ -16,3 +16,6 @@ TEMPLATE_IMG_PATH = f'{DATA_DIR}/alignment_templates/template.png'
 CALIBRATION_IMGS_PATH = f'{DATA_DIR}/calibration_images'
 CALIBRATION_RESULTS_PATH = f'{DATA_DIR}/calibration_results'
 CALIBRATION_IMGS_FORMAT = 'jpg'
+
+CALIBRATION_CORNERS_X = 6
+CALIBRATION_CORNERS_Y = 9
