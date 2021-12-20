@@ -62,7 +62,7 @@ def main():
 
         # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
         # img_concat = np.concatenate((img, img), axis=0)
-        cv2.imshow("Aligned", undistorted_img)
+        cv2.imshow('Aligned', undistorted_img)
         print(found)
 
         if cv2.waitKey(STD_WAIT) == ord('q'):
@@ -72,5 +72,5 @@ def main():
     cv2.destroyAllWindows()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

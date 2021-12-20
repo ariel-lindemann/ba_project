@@ -10,7 +10,7 @@ TOLERANCE = 0
 
 PROJECT_ROOT_DIR = '/Users/ariel/ba_project' #TODO change
 DATA_DIR = f'{PROJECT_ROOT_DIR}/data'
-# Calobration
+# Calibration
 PARAMS_DIR = f'{DATA_DIR}/camera_parameters'
 TEMPLATE_IMG_PATH = f'{DATA_DIR}/alignment_templates/template.png'
 CALIBRATION_IMGS_PATH = f'{DATA_DIR}/calibration_images'

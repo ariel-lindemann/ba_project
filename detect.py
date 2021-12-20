@@ -23,14 +23,6 @@ def find_aruco_markers(img, marker_size=DEFAULT_MARKER_SIZE, total_markers=250, 
     b_boxes = np.asarray(b_boxes)
     #b_boxes.reshape((b_boxes.shape[0] ,b_boxes.shape[2] , b_boxes.shape[3]))
 
-    """"
-    ids_dict = {}
-    for i in range(len(ids)):
-        ids_dict[i] = ids[i]
-
-
-        # TODO
-    """
     #found = np.asarray([b_boxes, ids])
 
     return [b_boxes, ids]

@@ -8,7 +8,7 @@ from defaults import CALIBRATION_IMGS_PATH, CALIBRATION_RESULTS_PATH, CAMERA_NUM
 
 
 def calibrate_camera(with_video=True, imgs_path=CALIBRATION_IMGS_PATH, corners_x = CALIBRATION_CORNERS_X, corners_y = CALIBRATION_CORNERS_Y):
-    """
+    '''
     Calibrate camera using images in the given path
 
     Parameters
@@ -20,7 +20,7 @@ def calibrate_camera(with_video=True, imgs_path=CALIBRATION_IMGS_PATH, corners_x
 
     imgs_path: String, optional
         where to look for calibration images (relative path). Only needed if `with_video` is False.
-    """
+    '''
 
     CORNERS_X = corners_x
     CORNERS_Y = corners_y
@@ -66,9 +66,9 @@ def calibrate_camera(with_video=True, imgs_path=CALIBRATION_IMGS_PATH, corners_x
 
 
 def produce_calibration_images(amount=15, format=CALIBRATION_IMGS_FORMAT):
-    """
+    '''
     Produces `amount` number of images from camera feed in the specified format and stores them in the calibration images directory.
-    """
+    '''
 
     cap = cv2.VideoCapture(CAMERA_NUMBER)
     
@@ -94,7 +94,8 @@ def produce_calibration_images(amount=15, format=CALIBRATION_IMGS_FORMAT):
 
 # TODO fix
 def undistort(img, cal_mtx, dist, alpha=1.0):
-    """Reverse distortion based on intrinsic parameters
+    '''
+    Reverse distortion based on intrinsic parameters
 
     Parameters
     ----------
@@ -111,7 +112,7 @@ def undistort(img, cal_mtx, dist, alpha=1.0):
         scaling parameter which determines how many pixels of the original image are retained. For alpha=0, some pixels
         may be removed, whereas for alpha=1 all original pixels are retained, while adding additional black pixels where
         required.
-    """
+    '''
 
     h,  w = img.shape[:2]
     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(cal_mtx, dist, (w, h), alpha, (w, h))
@@ -131,7 +132,7 @@ def calc_reprojection_err(objpoints, imgpoints, mtx, dist, rvecs, tvecs):
         imgpoints2, _ = cv2.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
         error = cv2.norm(imgpoints[i], imgpoints2, cv2.NORM_L2)/len(imgpoints2)
         mean_error += error
-    print("total error: {}".format(mean_error/len(objpoints)))
+    print('total error: {}'.format(mean_error/len(objpoints)))
 
 
 # TODO check for names
