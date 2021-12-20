@@ -65,7 +65,11 @@ def main():
         cv2.imshow("Aligned", undistorted_img)
         print(found)
 
-        cv2.waitKey(STD_WAIT)
+        if cv2.waitKey(STD_WAIT) == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
