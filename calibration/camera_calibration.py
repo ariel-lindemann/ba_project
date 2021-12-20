@@ -4,10 +4,10 @@ import numpy as np
 import os
 import glob
 
-from defaults import CALIBRATION_IMGS_PATH, CALIBRATION_RESULTS_PATH, CAMERA_NUMBER, PARAMS_DIR, CALIBRATION_IMGS_FORMAT
+from defaults import CALIBRATION_IMGS_PATH, CALIBRATION_RESULTS_PATH, CAMERA_NUMBER, PARAMS_DIR, CALIBRATION_IMGS_FORMAT, CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y
 
 
-def calibrate_camera(with_video=True, imgs_path=CALIBRATION_IMGS_PATH):
+def calibrate_camera(with_video=True, imgs_path=CALIBRATION_IMGS_PATH, corners_x = CALIBRATION_CORNERS_X, corners_y = CALIBRATION_CORNERS_Y):
     """
     Calibrate camera using images in the given path
 
@@ -21,14 +21,18 @@ def calibrate_camera(with_video=True, imgs_path=CALIBRATION_IMGS_PATH):
     imgs_path: String, optional
         where to look for calibration images (relative path). Only needed if `with_video` is False.
     """
+
+    CORNERS_X = corners_x
+    CORNERS_Y = corners_y
+
     if with_video:
         produce_calibration_images()
 
     # termination criteria
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-    objp = np.zeros((6*9, 3), np.float32)
-    objp[:, :2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
+    objp = np.zeros((CORNERS_Y*CORNERS_X, 3), np.float32)
+    objp[:, :2] = np.mgrid[0:CORNERS_X, 0:CORNERS_Y].T.reshape(-1, 2)
     # Arrays to store object points and image points from all the images.
     objpoints = []  # 3d point in real world space
     imgpoints = []  # 2d points in image plane.
@@ -37,14 +41,14 @@ def calibrate_camera(with_video=True, imgs_path=CALIBRATION_IMGS_PATH):
         img = cv2.imread(fname)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # Find the chess board corners
-        ret, corners = cv2.findChessboardCorners(gray, (9, 6), None)
+        ret, corners = cv2.findChessboardCorners(gray, (CORNERS_X, CORNERS_Y), None)
         # If found, add object points, image points (after refining them)
         if ret:
             objpoints.append(objp)
             corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
             imgpoints.append(corners)
             # Draw and display the corners
-            cv2.drawChessboardCorners(img, (9, 6), corners2, ret)
+            cv2.drawChessboardCorners(img, (CORNERS_X, CORNERS_Y), corners2, ret)
             n = fname.split('/')
             new_name = n[len(n) - 1]
             cv2.imwrite(f'{CALIBRATION_RESULTS_PATH}/{new_name}', img)
