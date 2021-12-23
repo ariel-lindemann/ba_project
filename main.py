@@ -32,9 +32,10 @@ def main():
     cap = cv2.VideoCapture(CAMERA_NUMBER)
     marker_type = MARKER_TYPE
 
+    force_recalibration = True
     camera_calibrated = is_calibrated()
 
-    if not camera_calibrated:
+    if not camera_calibrated or force_recalibration:
         calibrate_camera(with_video=True)
 
     cal_mtx = np.load(f'{PARAMS_DIR}/calibration_matrix.npy')
