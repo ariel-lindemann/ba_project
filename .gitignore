@@ -155,5 +155,8 @@ undistorted.png
 # Camera Parameters
 data/camera_parameters/*.npy
 
+# non-template Images in data folder
 data/calibration_images/*.jpg
 data/calibration_results/*.jpg
+
+data/*.jpg
