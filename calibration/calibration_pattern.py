@@ -1,14 +1,16 @@
 import cv2
 import numpy as np
-import pattern_utils
+from calibration.agv_info import AGV_info
+import calibration.pattern_utils as pattern_utils
 
 from math import sqrt
 from defaults import CALIBRATION_IMGS_FORMAT, DATA_DIR, CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y
 
 # TODO more elegant placement
-def create_pattern(agv_data, shape=[2100, 2970], chessboard_corners=[CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y]):
-    qr_code = pattern_utils.create_code(agv_data)
-    img = np.ones((shape[0], shape[1]), np.uint8)
+def create_pattern(agv_data: AGV_info, img_shape=[2100, 2970], chessboard_corners=[CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y]):
+    agv_json = agv_data.to_json()
+    qr_code = pattern_utils.create_code(agv_json)
+    img = np.ones((img_shape[0], img_shape[1]), np.uint8)
     # start with a white image
     img[:] = 255
 
@@ -16,7 +18,7 @@ def create_pattern(agv_data, shape=[2100, 2970], chessboard_corners=[CALIBRATION
         chessboard_corners[0], chessboard_corners[1], 200)
 
     pattern_utils.place_pattern_on_img(qr_code, img, [0, 0])
-    pattern_utils.place_pattern_on_img(chessboard, img, [0, int(shape[1]/2)])
+    pattern_utils.place_pattern_on_img(chessboard, img, [0, int(img_shape[1]/2)])
 
     cv2.imwrite(
         f'{DATA_DIR}/calibration_pattern.{CALIBRATION_IMGS_FORMAT}', img)
