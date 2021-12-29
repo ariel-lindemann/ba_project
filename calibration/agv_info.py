@@ -23,16 +23,7 @@ def json_to_agv_info(json_data, for_calibration=True):
 
 
 class AGV_info:
-    def __init__(self, length, width, height, raster_x, raster_y, serial_no):
-        self.length = length
-        self.width = width
-        self.height = height
-        self.raster_x = raster_x
-        self.raster_y = raster_y
-        self.serial_no = serial_no
-        self.corner = None
-
-    def __init__(self, length, width, height, raster_x, raster_y, serial_no, corner):
+    def __init__(self, length, width, height, raster_x, raster_y, serial_no, corner=None):
         self.length = length
         self.width = width
         self.height = height
