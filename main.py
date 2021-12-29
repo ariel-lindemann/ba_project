@@ -3,7 +3,7 @@ import numpy as np
 
 import detect
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
-from alignment import align
+from alignment.alignment import align
 from positioning import assess_position
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, TEMPLATE_IMG_PATH, STD_WAIT
