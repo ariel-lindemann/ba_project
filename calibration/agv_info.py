@@ -23,6 +23,30 @@ def json_to_agv_info(json_data, for_calibration=True):
 
 
 class AGV_info:
+    '''
+    Informations related to the AGV
+
+    length:
+        Length of AGV in mm
+
+    width:
+        Width of AGV in mm
+
+    height:
+        Height of AGV in mm
+
+    raster_x:
+        Raster space on X axis in mm
+
+    raster_y:
+        Raster space on Y axis in mm
+    
+    serial_no:
+        Additional information the user wants to store. Not used in this application
+
+    corner: str, optional
+        The corner on which this information is placed. Should be `'UL'`, `'UR'`, `'LL'`, `'LR'` or `None`
+   '''
     def __init__(self, length, width, height, raster_x, raster_y, serial_no, corner=None):
         self.length = length
         self.width = width
