@@ -30,7 +30,7 @@ def create_code(data, size=100):
     size: optional
         the length of the QR code square in pixels
     '''
-    qr_size = size
+    qr_size = round(size)
     qr_code = pyqrcode.create(data)
     qr_code = qr_code.text()
     # remove all newlines

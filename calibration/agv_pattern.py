@@ -17,7 +17,7 @@ def _create_corner_code(agv_info: AGV_info, corner, size=100):
     return code
 
 
-def create_agv_template(agv_info: AGV_info, qr_code_size=100, img_path=ALIGNMENT_TEMPLATE_IMG_PATH):
+def create_agv_template(agv_info: AGV_info, qr_code_size=100, img_path=ALIGNMENT_TEMPLATE_IMG_PATH, dpi = 5):
     '''
     Creates the template for aligning the captured image and saves it.
 
@@ -28,28 +28,33 @@ def create_agv_template(agv_info: AGV_info, qr_code_size=100, img_path=ALIGNMENT
         The information in the codes whitch will be placed in the corners.
 
     qr_code_size: int, optional
-        Length of the QR code square in pixels. Assume 1 pixel = 1 mm.
+        Length of the QR code square in pixels.
 
     img_path: str, optional
         The path in which the image will be saved. Default as specified in config.
+
+    dpi: int, optional
+        Pixel density on the image
     '''
+
+    SCALING_FACTOR = dpi * 3.9370079
 
     corners = ['UL', 'UR', 'LL', 'LR']
     corner_codes = {}
 
     for c in corners:
-        c_code = _create_corner_code(agv_info, c)
+        c_code = _create_corner_code(agv_info, c, size = 100 * SCALING_FACTOR)
         corner_codes.update([(c, c_code)])
 
-    length = agv_info.length
-    width = agv_info.width
+    length = round(agv_info.length * SCALING_FACTOR)
+    width = round(agv_info.width * SCALING_FACTOR)
 
     template = np.zeros([width, length], dtype=np.uint8)
     # turn image white
     template[:, :] = 255
 
     # margin such that the corners of the square match the image corners
-    margin = round(qr_code_size)
+    margin = round(qr_code_size * SCALING_FACTOR)
     # coordinates for each corner
     ul_coordinates = [0, 0]
     ur_coordinates = [width - margin, 0]
