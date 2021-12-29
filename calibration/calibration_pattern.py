@@ -1,13 +1,13 @@
 import cv2
 import numpy as np
-from calibration.agv_info import AGV_info
+from calibration.agv_info import AgvInfo
 import calibration.pattern_utils as pattern_utils
 
 from math import sqrt
 from defaults import CALIBRATION_IMGS_FORMAT, DATA_DIR, CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y
 
 # TODO more elegant placement
-def create_pattern(agv_data: AGV_info, img_shape=[2100, 2970], chessboard_corners=[CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y]):
+def create_pattern(agv_data: AgvInfo, img_shape=[2100, 2970], chessboard_corners=[CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y]):
     agv_json = agv_data.to_json()
     qr_code = pattern_utils.create_code(agv_json)
     img = np.ones((img_shape[0], img_shape[1]), np.uint8)
