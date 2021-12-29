@@ -1,15 +1,38 @@
 import cv2
 import numpy as np
 
+from flask import Flask, Response
+
 import detect
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
 from alignment import align
 from positioning import assess_position
 
-from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, TEMPLATE_IMG_PATH, STD_WAIT
+from defaults import DEFAULT_MARKER_SIZE, TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, TEMPLATE_IMG_PATH, STD_WAIT
 
 REQUIRED_POSITION = np.array([[100, 100], [800, 100], [800, 550], [100, 550]], np.int32)
 
+app = Flask(__name__)
+
+video = cv2.VideoCapture(CAMERA_NUMBER)
+
+@app.route('/')
+def index():
+    return "Default Message"
+    
+def gen(video):
+    while True:
+        success, image = video.read()
+        ret, jpeg = cv2.imencode('.jpg', image)
+        frame = jpeg.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+               
+@app.route('/video_feed')
+def video_feed():
+    global video
+    return Response(gen(video),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # TODO fix
 def assess_position(required, actual, tolerance=TOLERANCE):
@@ -27,6 +50,11 @@ def distance(point_a, point_b):
     sum_square = np.sum(square)
     distance = np.sqrt(sum_square)
     return distance
+
+@app.route('/calibrate', video = video)
+def calibrate(video = video):
+    calibrate_camera(with_video=True)
+    return 'Successfully calibrated'
 
 def main():
     cap = cv2.VideoCapture(CAMERA_NUMBER)
@@ -73,5 +101,7 @@ def main():
     cv2.destroyAllWindows()
 
 
+
+
 if __name__ == '__main__':
-    main()
+    app.run()
