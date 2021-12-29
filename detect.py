@@ -4,7 +4,7 @@ import cv2.aruco as aruco
 import numpy as np
 
 from defaults import DEFAULT_MARKER_SIZE
-from calibration.calibration_pattern import AGV_info, json_to_agv_info
+from calibration.agv_info import json_to_agv_info
 
 def find_aruco_markers(img, marker_size=DEFAULT_MARKER_SIZE, total_markers=250, draw=True):
     img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
