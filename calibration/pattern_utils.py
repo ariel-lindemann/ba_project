@@ -3,6 +3,7 @@ import pyqrcode
 import numpy as np
 from math import sqrt
 
+
 def place_pattern_on_img(pattern, img, pos):
     offset_x = pos[0]
     offset_y = pos[1]
@@ -16,7 +17,7 @@ def place_pattern_on_img(pattern, img, pos):
     return img
 
 
-def create_code(data, size=1000):
+def create_code(data, size=100):
     '''
     Creates a QR code representation of the given data as a numpy array.
 
@@ -24,10 +25,10 @@ def create_code(data, size=1000):
     ----------
 
     data:
-	the data to be encoded
+        the data to be encoded
 
     size: optional
-	the length of the QR code square in pixels
+        the length of the QR code square in pixels
     '''
     qr_size = size
     qr_code = pyqrcode.create(data)
