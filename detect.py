@@ -6,33 +6,31 @@ import numpy as np
 from defaults import DEFAULT_MARKER_SIZE
 from calibration.agv_info import json_to_agv_info
 
+
 def find_aruco_markers(img, marker_size=DEFAULT_MARKER_SIZE, total_markers=250, draw=True):
     img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     key = getattr(aruco, f'DICT_{marker_size}X{marker_size}_{total_markers}')
     aruco_dict = aruco.Dictionary_get(key)
     aruco_parameters = aruco.DetectorParameters_create()
 
-    # store bounding boxes, IDs and rejected
-    b_boxes, ids, rejected = aruco.detectMarkers(img_gray, aruco_dict, parameters=aruco_parameters)
+    # store bounding boxes, IDs, ignore rejected
+    b_boxes, ids, = aruco.detectMarkers(
+        img_gray, aruco_dict, parameters=aruco_parameters)
 
     if draw:
         aruco.drawDetectedMarkers(img, b_boxes, ids)
 
-    # TODO reshape b_boxes and ids into one array
-    # found = np.zeros((len(ids), 4, 2))
     b_boxes = np.asarray(b_boxes)
-    #b_boxes.reshape((b_boxes.shape[0] ,b_boxes.shape[2] , b_boxes.shape[3]))
 
-    #found = np.asarray([b_boxes, ids])
-
-    return [b_boxes, ids]
+    return ids, b_boxes
 
 
 def decode_qr(img):
     detector = cv2.QRCodeDetector()
-    data, found,  = detector.detectAndDecode(img)
+    data, found, _= detector.detectAndDecode(img)
 
     return data, found
+
 
 def decode_agv_info(img):
     data, found = decode_qr(img)
@@ -42,14 +40,15 @@ def decode_agv_info(img):
 
     return data, found
 
+
 def find_markers(img, marker_type):
     data = []
     found = []
 
     if marker_type == 'aruco':
-        found = find_aruco_markers(img)
+        data, found = find_aruco_markers(img)
     elif marker_type == 'qr':
-        data, found = decode_qr(img)
+        data, found = decode_agv_info(img)
     else:
         # TODO exception
         print(f'{marker_type} not a valid marker type!')

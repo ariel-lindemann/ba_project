@@ -2,7 +2,7 @@ CAMERA_NUMBER = 0
 STD_WAIT = 5
 
 # Detection
-MARKER_TYPE = 'aruco'
+MARKER_TYPE = 'qr'
 DEFAULT_MARKER_SIZE = 4
 
 # Positioning
