@@ -56,5 +56,14 @@ class AgvInfo:
         self.serial_no = serial_no
         self.corner = corner
 
+    def __eq__(self, other):
+        return (self.length == other.length and
+            self.width == other.width and
+            self.height == other.height and
+            self.raster_x == other.raster_x and
+            self.raster_y == other.raster_y and
+            self.serial_no == other.serial_no
+        )
+
     def to_json(self):
         return json.dumps(self.__dict__)
