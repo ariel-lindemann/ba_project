@@ -4,6 +4,15 @@ from calibration.agv_info import AgvInfo
 from defaults import DATA_DIR, CALIBRATION_IMGS_FORMAT
 
 
+def create_pattern(img_path='tests/test_data/alignment_template.jpg'):
+    agv = AgvInfo(560, 380, 200, 50, 50, 'test')
+    try:
+        os.remove(img_path)
+    except FileNotFoundError:
+        pass
+    return cal.create_pattern(agv, img_path=img_path)
+
+
 def test_create_chess_board_correct_size():
     x = 5
     y = 5
@@ -14,7 +23,6 @@ def test_create_chess_board_correct_size():
 
 
 def test_pattern_is_created():
-    agv = AgvInfo(500, 500, 50, 50, 50, 'test')
     img_path = 'tests/test_data/calibration_pattern.jpg'
-    cal.create_pattern(agv, img_path=img_path)
+    create_pattern(img_path)
     assert os.path.exists(img_path)
