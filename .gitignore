@@ -160,3 +160,5 @@ data/calibration_images/*.jpg
 data/calibration_results/*.jpg
 
 data/*.jpg
+tests/test_data/*.jpg
+tests/test_data/*.png
