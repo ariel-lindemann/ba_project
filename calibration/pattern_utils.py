@@ -17,7 +17,7 @@ def place_pattern_on_img(pattern, img, pos):
     return img
 
 
-def create_code(data, size=100):
+def create_code(data, size=1000):
     '''
     Creates a QR code representation of the given data as a numpy array.
 
