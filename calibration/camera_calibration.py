@@ -18,7 +18,7 @@ def calibrate_camera(with_video=True, imgs_path=CALIBRATION_IMGS_PATH, corners_x
         if True, then the calibration images will be taken from the camera feed. 
         Otherwise they will be read from the calibraition images path
 
-    imgs_path: String, optional
+    imgs_path: str, optional
         where to look for calibration images (relative path). Only needed if `with_video` is False.
     '''
 
@@ -108,10 +108,10 @@ def undistort(img, cal_mtx, dist, alpha=1.0):
     dist:
         the distortion coefficients
 
-    alpha:
-        scaling parameter which determines how many pixels of the original image are retained. For alpha=0, some pixels
-        may be removed, whereas for alpha=1 all original pixels are retained, while adding additional black pixels where
-        required.
+    alpha: float, optional
+        scaling parameter which determines how many pixels of the original image are retained. For `alpha=0.0`, some pixels
+        may be removed, whereas for `alpha=1.0` all original pixels are retained, while adding additional black pixels where
+        required. 
     '''
 
     h,  w = img.shape[:2]

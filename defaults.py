@@ -13,6 +13,7 @@ DATA_DIR = f'{PROJECT_ROOT_DIR}/data'
 # Calibration
 PARAMS_DIR = f'{DATA_DIR}/camera_parameters'
 ALIGNMENT_TEMPLATE_IMG_PATH = f'{DATA_DIR}/alignment_templates/template.png'
+CALIBRATION_PATTERN_PATH = f'{DATA_DIR}/calibration_pattern.{CALIBRATION_IMGS_FORMAT}'
 CALIBRATION_IMGS_PATH = f'{DATA_DIR}/calibration_images'
 CALIBRATION_RESULTS_PATH = f'{DATA_DIR}/calibration_results'
 CALIBRATION_IMGS_FORMAT = 'jpg'
