@@ -9,7 +9,7 @@ from defaults import CALIBRATION_IMGS_PATH, CALIBRATION_CORNERS_X, CALIBRATION_C
 # TODO more elegant placement
 
 
-def create_pattern(agv_data: AgvInfo, img_shape=[2100, 2970], chessboard_corners=[CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y], img_path=CALIBRATION_IMGS_PATH):
+def create_pattern(agv_data: AgvInfo, img_shape=[2100, 2970], chessboard_corners=[CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y], img_path=CALIBRATION_IMGS_PATH, write_file=True):
     agv_json = agv_data.to_json()
     qr_code = pattern_utils.create_code(agv_json)
     img = np.ones((img_shape[0], img_shape[1]), np.uint8)
@@ -23,7 +23,10 @@ def create_pattern(agv_data: AgvInfo, img_shape=[2100, 2970], chessboard_corners
     pattern_utils.place_pattern_on_img(
         chessboard, img, [0, int(img_shape[1]/2)])
 
-    cv2.imwrite(img_path, img)
+    if write_file:
+        cv2.imwrite(img_path, img)
+
+    return img
 
 
 def create_chess_board(x, y, scale):

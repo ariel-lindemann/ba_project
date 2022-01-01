@@ -17,7 +17,7 @@ def _create_corner_code(agv_info: AgvInfo, corner, size=100):
     return code
 
 
-def create_agv_template(agv_info: AgvInfo, qr_code_size=100, img_path=ALIGNMENT_TEMPLATE_IMG_PATH, dpi = 5):
+def create_agv_template(agv_info: AgvInfo, qr_code_size=100, dpi = 5, img_path=ALIGNMENT_TEMPLATE_IMG_PATH, write_file=True):
     '''
     Creates the template for aligning the captured image and saves it.
 
@@ -35,6 +35,9 @@ def create_agv_template(agv_info: AgvInfo, qr_code_size=100, img_path=ALIGNMENT_
 
     dpi: int, optional
         Pixel density on the image
+
+    write_file: bool, optional
+        Should the file be written to disk
     '''
 
     SCALING_FACTOR = dpi * 3.9370079
@@ -66,5 +69,6 @@ def create_agv_template(agv_info: AgvInfo, qr_code_size=100, img_path=ALIGNMENT_
     place_pattern_on_img(corner_codes['LL'], template, ll_coordinates)
     place_pattern_on_img(corner_codes['LR'], template, lr_coordinates)
     # save template to disk
-    cv2.imwrite(img_path, template)
+    if write_file:
+        cv2.imwrite(img_path, template)
     return template
