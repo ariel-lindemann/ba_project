@@ -7,5 +7,6 @@ test:
 coverage:
 	python3 -m coverage run -m pytest
 	coverage xml
+	coverage html
 
 .PHONY: init test
