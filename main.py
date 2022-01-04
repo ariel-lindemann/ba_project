@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from flask import Flask, Response
+from flask import Flask, render_template, Response
 
 import detect
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
@@ -18,7 +18,7 @@ video = cv2.VideoCapture(CAMERA_NUMBER)
 
 @app.route('/')
 def index():
-    return "Default Message"
+    return render_template('index.html')
     
 def gen(video):
     while True:
@@ -51,8 +51,8 @@ def distance(point_a, point_b):
     distance = np.sqrt(sum_square)
     return distance
 
-@app.route('/calibrate', video = video)
-def calibrate(video = video):
+@app.route('/calibrate')
+def calibrate():
     calibrate_camera(with_video=True)
     return 'Successfully calibrated'
 
