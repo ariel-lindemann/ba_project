@@ -17,7 +17,25 @@ def _create_corner_code(agv_info: AgvInfo, corner, size=100):
     return code
 
 
-def create_agv_template(agv_info: AgvInfo, qr_code_size=100, dpi = 5, img_path=ALIGNMENT_TEMPLATE_IMG_PATH, write_file=True):
+def _place_corner_codes(corner_codes, width, length, margin):
+    template = np.zeros([width, length], dtype=np.uint8)
+    # turn image white
+    template[:, :] = 255
+    # coordinates for each corner
+    ul_coordinates = [0, 0]
+    ur_coordinates = [width - margin, 0]
+    ll_coordinates = [0, length - margin]
+    lr_coordinates = [width - margin, length - margin]
+    # draw the corner codes
+    place_pattern_on_img(corner_codes['UL'], template, ul_coordinates)
+    place_pattern_on_img(corner_codes['UR'], template, ur_coordinates)
+    place_pattern_on_img(corner_codes['LL'], template, ll_coordinates)
+    place_pattern_on_img(corner_codes['LR'], template, lr_coordinates)
+
+    return template
+
+
+def create_agv_template(agv_info: AgvInfo, qr_code_size=100, dpi=5, img_path=ALIGNMENT_TEMPLATE_IMG_PATH, write_file=True):
     '''
     Creates the template for aligning the captured image and saves it.
 
@@ -46,28 +64,16 @@ def create_agv_template(agv_info: AgvInfo, qr_code_size=100, dpi = 5, img_path=A
     corner_codes = {}
 
     for c in corners:
-        c_code = _create_corner_code(agv_info, c, size = 100 * SCALING_FACTOR)
+        c_code = _create_corner_code(agv_info, c, size=100 * SCALING_FACTOR)
         corner_codes.update([(c, c_code)])
 
     length = round(agv_info.length * SCALING_FACTOR)
     width = round(agv_info.width * SCALING_FACTOR)
 
-    template = np.zeros([width, length], dtype=np.uint8)
-    # turn image white
-    template[:, :] = 255
-
     # margin such that the corners of the square match the image corners
     margin = round(qr_code_size * SCALING_FACTOR)
-    # coordinates for each corner
-    ul_coordinates = [0, 0]
-    ur_coordinates = [width - margin, 0]
-    ll_coordinates = [0, length - margin]
-    lr_coordinates = [width - margin, length - margin]
-    # draw the corner codes
-    place_pattern_on_img(corner_codes['UL'], template, ul_coordinates)
-    place_pattern_on_img(corner_codes['UR'], template, ur_coordinates)
-    place_pattern_on_img(corner_codes['LL'], template, ll_coordinates)
-    place_pattern_on_img(corner_codes['LR'], template, lr_coordinates)
+
+    template = _place_corner_codes(corner_codes, width, length, margin)
     # save template to disk
     if write_file:
         cv2.imwrite(img_path, template)
