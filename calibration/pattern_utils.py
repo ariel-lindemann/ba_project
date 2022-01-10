@@ -38,27 +38,40 @@ def create_code(data, size=1000):
     # get total number of pixels (characters) from the QR Code string
     size = len(qr_code)
     # calculate image dimensions (qr code is square)
-    shape = int(sqrt(size))
-    qr_array = np.zeros([shape, shape], dtype='uint8')
-    row = column = 0
-
-    for char in qr_code:
-        if char == '0':
-            qr_array[row][column] = 255
-            column = column + 1
-
-        if char == '1':
-            qr_array[row][column] = 0
-            column = column + 1
-
-        if column == shape:
-            row = row + 1
-            column = 0
-
+    length = int(sqrt(size))
+    try:
+        qr_array = _create_qr_array(qr_code, length, size)
+    except ZeroDivisionError('Length of QR was 0'):
+        qr_array = _create_qr_array(qr_code, length, 1)
     # scale up the QR code.
     qr_array = cv2.resize(qr_array, (qr_size, qr_size),
                           fx=0, fy=0, interpolation=cv2.INTER_AREA)
     # apply border to QR code
     # qr_array = cv2.copyMakeBorder(qr_array, 2, 2, 2, 2, cv2.BORDER_CONSTANT, value=0)
+
+    return qr_array
+
+
+def _create_qr_array(qr_string, length, size=1000):
+    '''
+    Reshape QR string into a `length * length` matrix
+    '''
+
+    scale = 1
+    qr_array = np.zeros([length, length], dtype='uint8')
+    row = column = 0
+
+    for char in qr_string:
+        if char == '0':
+            qr_array[row:row+(scale-1)][column:column+(scale-1)] = 255
+            column = column + scale
+
+        if char == '1':
+            qr_array[row:row+(scale-1)][column:column+(scale-1)] = 0
+            column = column + scale
+
+        if column == length:
+            row = row + scale
+            column = 0
 
     return qr_array
