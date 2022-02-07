@@ -10,6 +10,8 @@ from positioning import assess_position
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
 
+from exceptions import InvalidBarcodeException
+
 REQUIRED_POSITION = np.array([[100, 100], [800, 100], [800, 550], [100, 550]], np.int32)
 
 
@@ -43,7 +45,6 @@ def test_qr_detection():
 def main():
 
     test_qr_detection()
-    return
 
     cap = cv2.VideoCapture(CAMERA_NUMBER)
     marker_type = MARKER_TYPE
@@ -69,7 +70,11 @@ def main():
 
         undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
-        found, data = detect.find_markers(img, marker_type)  # boxes and IDs of found markers
+        try: 
+            found, data = detect.find_markers(img, marker_type)  # boxes and IDs of found markers
+        except InvalidBarcodeException:
+            found = []
+            data = 'Invalid code' # TODO better datastructure
         # position_correct = assess_position(REQUIRED_POSITION, found[0])
         position_box_color = (0, 0, 255)
         # if position_correct: position_box_color=(0, 255, 0)
