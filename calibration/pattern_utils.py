@@ -2,6 +2,8 @@ import cv2
 import pyqrcode
 import numpy as np
 from math import sqrt
+import zxingcpp as zx
+from aztec_code_generator import AztecCode
 
 
 def place_pattern_on_img(pattern, img, pos):
@@ -17,7 +19,16 @@ def place_pattern_on_img(pattern, img, pos):
     return img
 
 
-def create_code(data, size=1000):
+def create_code(data, size = 1000, code_type = 'aztec'):
+    if code_type == 'qr':
+        return _create_qr_code(data, size=size)
+    elif code_type == 'aztec':
+        return _create_aztec_code_array(data)
+    else:
+        raise RuntimeError(f'{code_type} is not a supported code type')
+
+
+def _create_qr_code(data, size=1000):
     '''
     Creates a QR code representation of the given data as a numpy array.
 
@@ -62,3 +73,12 @@ def create_code(data, size=1000):
     # qr_array = cv2.copyMakeBorder(qr_array, 2, 2, 2, 2, cv2.BORDER_CONSTANT, value=0)
 
     return qr_array
+
+
+def _create_aztec_code_img(data):
+    code = AztecCode(data)
+    return code
+
+def _create_aztec_code_array(data):
+    img = _create_aztec_code_img(data)
+    return np.array(img)

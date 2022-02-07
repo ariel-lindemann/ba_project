@@ -1,6 +1,7 @@
 # TODO move to different module?
 import cv2
 import numpy as np
+import zxingcpp as zx
 from calibration.pattern_utils import create_code, place_pattern_on_img
 from calibration.agv_info import AgvInfo
 
@@ -13,7 +14,7 @@ def _create_corner_code(agv_info: AgvInfo, corner, size=100):
     '''
     agv_info.corner = corner
     agv_json = agv_info.to_json()
-    code = create_code(agv_json, size=size)
+    code = create_code(agv_json, size=size, code_type='qr')
     return code
 
 
