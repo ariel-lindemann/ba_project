@@ -13,7 +13,7 @@ def create_pattern(img_path='tests/test_data/alignment_template.jpg', write_file
         except FileNotFoundError:
             pass
 
-    return pat.create_agv_template(agv, img_path=img_path, write_file=write_file)
+    return pat.create_agv_template(agv, img_path=img_path, write_file=write_file, code_type='qr')
 
 
 def test_agv_pattern_created():

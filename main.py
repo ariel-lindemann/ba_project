@@ -36,15 +36,7 @@ def create_template():
     agv = agv_info.AGV_info(defaults.DEFAULT_AGV_LENGTH, defaults.DEFAULT_AGV_WIDTH, defaults.DEFAULT_AGV_HEIGHT, 50, 50, 'ariel11')
     agv_pattern.create_agv_template(agv)
 
-def test_qr_detection():
-    img = cv2.imread(ALIGNMENT_TEMPLATE_IMG_PATH)
-    found, data = detect.find_markers(img, 'qr')
-    print(found)
-    print(data)
-
 def main():
-
-    test_qr_detection()
 
     cap = cv2.VideoCapture(CAMERA_NUMBER)
     marker_type = MARKER_TYPE
@@ -71,7 +63,7 @@ def main():
         undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
         try: 
-            found, data = detect.find_markers(img, marker_type)  # boxes and IDs of found markers
+            data, found = detect.find_markers(img)  # boxes and IDs of found markers
         except InvalidBarcodeException:
             found = []
             data = 'Invalid code' # TODO better datastructure

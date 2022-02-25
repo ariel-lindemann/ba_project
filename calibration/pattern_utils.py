@@ -18,6 +18,7 @@ def place_pattern_on_img(pattern, img, pos):
     return img
 
 
+#TODO use generic zx scheme
 def create_code(data, size = 1000, code_type = 'aztec'):
     if code_type == 'qr':
         return _create_qr_code(data, size)
@@ -27,6 +28,7 @@ def create_code(data, size = 1000, code_type = 'aztec'):
         raise RuntimeError(f'{code_type} is not a supported code type')
 
 
+# TODO replace with zx?
 def _create_qr_code(data, size):
     '''
     Creates a QR code representation of the given data as a numpy array.
