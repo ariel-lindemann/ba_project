@@ -73,7 +73,10 @@ def _create_qr_code(data, size):
 
     return qr_array
 
+def _create_qr_code_zx(data, size):
+    img = zx.write_barcode(zx.BarcodeFormat.QRCode, data, width=size, height=size) 
+    return img
 
 def _create_aztec_code_array(data, size):
-    img = zx.write_barcode(zx.BarcodeFormat.Aztec, data, width=size, length=size) 
+    img = zx.write_barcode(zx.BarcodeFormat.Aztec, data, width=size, height=size) 
     return img
