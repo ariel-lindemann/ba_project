@@ -15,7 +15,7 @@ def test_detect_qr():
 def test_detect_aztec():
     data = 'test_data'
     img_path = 'tests/test_data/aztec_array.png'
-    code = cv2.imread(img_path)
+    code = pu.create_code(data, code_type='aztec')
 
     decoded = detect.decode(code).text
     
