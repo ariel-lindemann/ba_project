@@ -8,13 +8,13 @@ from calibration.agv_info import AgvInfo
 from defaults import ALIGNMENT_TEMPLATE_IMG_PATH
 
 
-def _create_corner_code(agv_info: AgvInfo, corner, size=100):
+def _create_corner_code(agv_info: AgvInfo, corner, code_type='qr', size=100):
     '''
     Wrapper for `pattern_utils.create_code()`. Adds corner information to the code.
     '''
     agv_info.corner = corner
     agv_json = agv_info.to_json()
-    code = create_code(agv_json, size=size, code_type='qr')
+    code = create_code(agv_json, size=size, code_type=code_type)
     return code
 
 
