@@ -7,7 +7,7 @@ def test_detect_qr():
     data = 'test_data'
     code = pu.create_code(data, code_type='qr')
 
-    decoded = detect.decode_qr(code).text
+    decoded = detect.decode(code).text
     
     print(code)
     assert(data == decoded)
@@ -17,7 +17,7 @@ def test_detect_aztec():
     img_path = 'tests/test_data/aztec_array.png'
     code = cv2.imread(img_path)
 
-    decoded = detect.decode_aztec(code).text
+    decoded = detect.decode(code).text
     
     print(code)
     assert(data == decoded)

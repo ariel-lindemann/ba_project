@@ -28,20 +28,19 @@ def find_aruco_markers(img, marker_size=DEFAULT_MARKER_SIZE, total_markers=250, 
     return ids, b_boxes
 
 
-def decode_qr(img):
-
+def decode(img):
+    #TODO multiple detection
     results = zx.read_barcode(img)
-
     if not results.valid:
         raise InvalidBarcodeException('Could not read barcode')
     return results
 
 
 def decode_agv_info(img):
-    results = decode_qr(img)
+    results = decode(img)
 
     data = [results.text]
-    found = results.position
+    found = [results.position]
 
     for i in data:
         i = json_to_agv_info(i)
