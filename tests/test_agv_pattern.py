@@ -5,7 +5,7 @@ import json
 from calibration.agv_info import AgvInfo
 
 
-def create_pattern(img_path='tests/test_data/alignment_template.jpg', write_file=True):
+def create_pattern(img_path='tests/test_data/alignment_template.jpg', write_file=True, border=0):
     agv = AgvInfo(560, 380, 200, 50, 50, 'test')
     if write_file:
         try:
@@ -13,7 +13,7 @@ def create_pattern(img_path='tests/test_data/alignment_template.jpg', write_file
         except FileNotFoundError:
             pass
 
-    return pat.create_agv_template(agv, img_path=img_path, write_file=write_file, code_type='qr')
+    return pat.create_agv_template(agv, img_path=img_path, write_file=write_file, code_type='qr', border=border)
 
 
 def test_agv_pattern_created():
