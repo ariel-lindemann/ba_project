@@ -2,9 +2,12 @@ import cv2
 from numpy.core.fromnumeric import shape
 import cv2.aruco as aruco
 import numpy as np
+import zxingcpp as zx
 
 from defaults import DEFAULT_MARKER_SIZE
 from calibration.agv_info import json_to_agv_info
+
+from exceptions import InvalidBarcodeException
 
 
 def find_aruco_markers(img, marker_size=DEFAULT_MARKER_SIZE, total_markers=250, draw=True):
@@ -25,15 +28,19 @@ def find_aruco_markers(img, marker_size=DEFAULT_MARKER_SIZE, total_markers=250, 
     return ids, b_boxes
 
 
-def decode_qr(img):
-    detector = cv2.QRCodeDetector()
-    data, found, _= detector.detectAndDecode(img)
-
-    return data, found
+def decode(img):
+    #TODO multiple detection
+    results = zx.read_barcode(img)
+    if not results.valid:
+        raise InvalidBarcodeException('Could not read barcode')
+    return results
 
 
 def decode_agv_info(img):
-    data, found = decode_qr(img)
+    results = decode(img)
+
+    data = [results.text]
+    found = [results.position]
 
     for i in data:
         i = json_to_agv_info(i)

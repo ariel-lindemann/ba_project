@@ -1,19 +1,20 @@
 # TODO move to different module?
 import cv2
 import numpy as np
+import zxingcpp as zx
 from calibration.pattern_utils import create_code, place_pattern_on_img
 from calibration.agv_info import AgvInfo
 
 from defaults import ALIGNMENT_TEMPLATE_IMG_PATH
 
 
-def _create_corner_code(agv_info: AgvInfo, corner, size=100):
+def _create_corner_code(agv_info: AgvInfo, corner, code_type='qr', size=100):
     '''
     Wrapper for `pattern_utils.create_code()`. Adds corner information to the code.
     '''
     agv_info.corner = corner
     agv_json = agv_info.to_json()
-    code = create_code(agv_json, size=size)
+    code = create_code(agv_json, size=size, code_type=code_type)
     return code
 
 
@@ -35,7 +36,7 @@ def _place_corner_codes(corner_codes, width, length, margin):
     return template
 
 
-def create_agv_template(agv_info: AgvInfo, qr_code_size=100, dpi=5, img_path=ALIGNMENT_TEMPLATE_IMG_PATH, write_file=True):
+def create_agv_template(agv_info: AgvInfo, pattern_size=100, code_type = 'aztec', dpi=5, img_path=ALIGNMENT_TEMPLATE_IMG_PATH, write_file=True):
     '''
     Creates the template for aligning the captured image and saves it.
 
@@ -64,14 +65,14 @@ def create_agv_template(agv_info: AgvInfo, qr_code_size=100, dpi=5, img_path=ALI
     corner_codes = {}
 
     for c in corners:
-        c_code = _create_corner_code(agv_info, c, size=100 * SCALING_FACTOR)
+        c_code = _create_corner_code(agv_info, c, code_type=code_type, size=round(pattern_size * SCALING_FACTOR))#TODO why 100?
         corner_codes.update([(c, c_code)])
 
     length = round(agv_info.length * SCALING_FACTOR)
     width = round(agv_info.width * SCALING_FACTOR)
 
     # margin such that the corners of the square match the image corners
-    margin = round(qr_code_size * SCALING_FACTOR)
+    margin = round(pattern_size * SCALING_FACTOR)
 
     template = _place_corner_codes(corner_codes, width, length, margin)
     # save template to disk

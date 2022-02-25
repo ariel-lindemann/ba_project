@@ -9,9 +9,9 @@ from defaults import CALIBRATION_IMGS_PATH, CALIBRATION_CORNERS_X, CALIBRATION_C
 # TODO more elegant placement
 
 
-def create_pattern(agv_data: AgvInfo, img_shape=[2100, 2970], chessboard_corners=[CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y], img_path=CALIBRATION_IMGS_PATH, write_file=True):
+def create_pattern(agv_data: AgvInfo, img_shape=[2100, 2970], chessboard_corners=[CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y], img_path=CALIBRATION_IMGS_PATH, write_file=True, code_type='qr'):
     agv_json = agv_data.to_json()
-    qr_code = pattern_utils.create_code(agv_json)
+    qr_code = pattern_utils.create_code(agv_json, code_type=code_type)
     img = np.ones((img_shape[0], img_shape[1]), np.uint8)
     # start with a white image
     img[:] = 255
