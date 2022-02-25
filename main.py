@@ -63,7 +63,7 @@ def main():
         undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
         try: 
-            data, found = detect.find_markers(img)  # boxes and IDs of found markers
+            data, found = detect.find_markers(img, marker_type='qr')  # boxes and IDs of found markers
         except InvalidBarcodeException:
             found = []
             data = 'Invalid code' # TODO better datastructure
