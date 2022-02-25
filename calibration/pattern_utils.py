@@ -3,7 +3,6 @@ import pyqrcode
 import numpy as np
 from math import sqrt
 import zxingcpp as zx
-from aztec_code_generator import AztecCode
 
 
 def place_pattern_on_img(pattern, img, pos):
@@ -21,14 +20,14 @@ def place_pattern_on_img(pattern, img, pos):
 
 def create_code(data, size = 1000, code_type = 'aztec'):
     if code_type == 'qr':
-        return _create_qr_code(data, size=size)
+        return _create_qr_code(data, size)
     elif code_type == 'aztec':
-        return _create_aztec_code_array(data)
+        return _create_aztec_code_array(data, size)
     else:
         raise RuntimeError(f'{code_type} is not a supported code type')
 
 
-def _create_qr_code(data, size=1000):
+def _create_qr_code(data, size):
     '''
     Creates a QR code representation of the given data as a numpy array.
 
@@ -75,10 +74,6 @@ def _create_qr_code(data, size=1000):
     return qr_array
 
 
-def _create_aztec_code_img(data):
-    code = AztecCode(data)
-    return code
-
-def _create_aztec_code_array(data):
-    img = _create_aztec_code_img(data)
-    return np.array(img)
+def _create_aztec_code_array(data, size):
+    img = zx.write_barcode(zx.BarcodeFormat.Aztec, data, width=size, length=size) 
+    return img
