@@ -1,5 +1,8 @@
 import cv2
+from cv2 import threshold
+from cv2 import THRESH_BINARY
 import numpy as np
+from sklearn import cluster
 import defaults
 
 import detect
@@ -9,6 +12,7 @@ from positioning import assess_position
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
+from cluster import cluster_dbscan
 
 from exceptions import InvalidBarcodeException
 
@@ -31,10 +35,6 @@ def distance(point_a, point_b):
     sum_square = np.sum(square)
     distance = np.sqrt(sum_square)
     return distance
-
-def create_template():
-    agv = agv_info.AGV_info(defaults.DEFAULT_AGV_LENGTH, defaults.DEFAULT_AGV_WIDTH, defaults.DEFAULT_AGV_HEIGHT, 50, 50, 'ariel11')
-    agv_pattern.create_agv_template(agv)
 
 def main():
 
@@ -60,25 +60,38 @@ def main():
         if not success:
             raise RuntimeError('Image capture unsuccessful')
 
-        undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
+
+        THRESHOLD_BLOCK_SIZE = 21
+        THRESHOLD_CONSTANT = 5
+
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        canny_img = cv2.Canny(img, 150, 200)
+        threshold_img = cv2.adaptiveThreshold(canny_img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, THRESHOLD_BLOCK_SIZE, THRESHOLD_CONSTANT)
+        threshold_img = cv2.cvtColor(threshold_img, cv2.COLOR_GRAY2BGR)
+
+        canny_img = cv2.cvtColor(canny_img, cv2.COLOR_GRAY2BGR)
+        dbscan_img = cluster_dbscan(threshold_img)
+        #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
         try: 
-            data, found = detect.find_markers(img, marker_type='qr')  # boxes and IDs of found markers
+            data, found = detect.find_markers(img, marker_type='aztec')  # boxes and IDs of found markers
         except InvalidBarcodeException:
             found = []
-            data = 'Invalid code' # TODO better datastructure
+            data = 'Invalid code'
+
+
         # position_correct = assess_position(REQUIRED_POSITION, found[0])
-        position_box_color = (0, 0, 255)
+        position_box_color = (0, 0, 255) #TODO
         # if position_correct: position_box_color=(0, 255, 0)
         cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
-        #cv2.putText(img, f'{len(found[0])} Markers', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3, color=(0,255,0))
+        cv2.putText(img, f'Decoded: {data}', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3, color=(0,255,0))
 
         # aligned_img = align(img, template_image , found, template_points)
 
         # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
-        # img_concat = np.concatenate((img, img), axis=0)
-        cv2.imshow('Aligned', undistorted_img)
-        print(found)
+        img_concat = np.concatenate((img, threshold_img, dbscan_img), axis=0)
+        cv2.imshow('Aligned', img_concat)
+        print(data, found)
 
         if cv2.waitKey(STD_WAIT) == ord('q'):
             break

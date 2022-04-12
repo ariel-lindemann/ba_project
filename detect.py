@@ -38,12 +38,15 @@ def decode(img):
 
 def decode_agv_info(img):
     results = decode(img)
-
+    #TODO needs to be changed (single responsibility)
+    # we need the raw data as well as agv
     data = [results.text]
     found = [results.position]
 
+    agv_data = []
+
     for i in data:
-        i = json_to_agv_info(i)
+        agv_data.append(json_to_agv_info(i))
 
     return data, found
 
@@ -52,12 +55,11 @@ def find_markers(img, marker_type):
     data = []
     found = []
 
-    if marker_type == 'aruco':
-        data, found = find_aruco_markers(img)
-    elif marker_type == 'qr':
-        data, found = decode_agv_info(img)
-    else:
-        # TODO exception
-        print(f'{marker_type} not a valid marker type!')
+    results = decode(img)
+    # TODO exception
+
+    data = [results.text]
+    found = [results.position]
+
 
     return data, found
