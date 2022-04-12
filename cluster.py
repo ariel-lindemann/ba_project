@@ -3,6 +3,7 @@ import numpy as np
 
 from sklearn.cluster import DBSCAN
 
+
 #TODO 1 find the clusters
 # DBSCAN what are we looking for?
 # black points from the thresholded image
@@ -10,6 +11,8 @@ from sklearn.cluster import DBSCAN
 #TODO 3 find the box of the cluster
 #TODO 4 segment the image accordingly
 
+THRESHOLD_BLOCK_SIZE = 21
+THRESHOLD_CONSTANT = 5
 
 def k_means_cluster(img, k):
     #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # convert to RGB
@@ -32,7 +35,14 @@ def img_points_with_colors(img, color_value):
 
     return 0
 
+def _threshold_img(img):
+    canny_img = cv2.Canny(img, 150, 200)
+    threshold_img = cv2.adaptiveThreshold(canny_img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, THRESHOLD_BLOCK_SIZE, THRESHOLD_CONSTANT)
+    threshold_img = cv2.cvtColor(threshold_img, cv2.COLOR_GRAY2BGR)
+    return threshold_img
+
 def cluster_dbscan(img, eps = 0.4, min_samples = 20):
+    img = _threshold_img(img)
     Z = np.float32(img.reshape((-1,3)))
     db = DBSCAN(eps= eps, min_samples=min_samples).fit(Z[:,:2])
     return np.uint8(db.labels_.reshape(img.shape[:2]))

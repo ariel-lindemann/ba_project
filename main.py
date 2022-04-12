@@ -12,7 +12,7 @@ from positioning import assess_position
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
-from cluster import cluster_dbscan
+from cluster import cluster_dbscan, _threshold_img #TODO remove protected method
 
 from exceptions import InvalidBarcodeException
 
@@ -61,15 +61,9 @@ def main():
             raise RuntimeError('Image capture unsuccessful')
 
 
-        THRESHOLD_BLOCK_SIZE = 21
-        THRESHOLD_CONSTANT = 5
-
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        canny_img = cv2.Canny(img, 150, 200)
-        threshold_img = cv2.adaptiveThreshold(canny_img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, THRESHOLD_BLOCK_SIZE, THRESHOLD_CONSTANT)
-        threshold_img = cv2.cvtColor(threshold_img, cv2.COLOR_GRAY2BGR)
+        threshold_img = _threshold_img(img)
 
-        canny_img = cv2.cvtColor(canny_img, cv2.COLOR_GRAY2BGR)
         dbscan_img = cluster_dbscan(threshold_img)
         #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
