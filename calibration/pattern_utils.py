@@ -1,7 +1,3 @@
-import cv2
-import pyqrcode
-import numpy as np
-from math import sqrt
 import zxingcpp as zx
 
 
