@@ -1,7 +1,7 @@
 import json
 import calibration.calibration_pattern as cal
 import os
-import cv2
+import zxingcpp as zx
 from calibration.agv_info import AgvInfo
 from defaults import DATA_DIR, CALIBRATION_IMGS_FORMAT
 
@@ -32,8 +32,7 @@ def test_pattern_is_created():
 
 def test_pattern_correctness():
     img = create_pattern(write_file=False)
-    detector = cv2.QRCodeDetector()
-    data, _, _ = detector.detectAndDecode(img)
+    data = zx.read_barcode(img).text
     if not data:
         assert False, 'No data detected'
     else:

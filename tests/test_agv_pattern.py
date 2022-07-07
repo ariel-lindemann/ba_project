@@ -1,7 +1,7 @@
 import calibration.agv_pattern as pat
 import os
-import cv2
 import json
+import zxingcpp as zx
 from calibration.agv_info import AgvInfo
 
 
@@ -24,8 +24,8 @@ def test_agv_pattern_created():
 
 def test_agv_pattern_correct():
     img = create_pattern(write_file=False)
-    detector = cv2.QRCodeDetector()
-    data, _, _ = detector.detectAndDecode(img)
+    #TODO multiple detection
+    data = zx.read_barcode(img).text
     if not data:
         assert False, 'No data detected'
     for d in data:
