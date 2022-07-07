@@ -1,7 +1,6 @@
 import detect
-import cv2
 import calibration.pattern_utils as pu
-from calibration.agv_info import AgvInfo
+from calibration.agv_info import AgvInfo, json_to_agv_info
 
 def test_detect_qr():
     data = 'test_data'
@@ -27,7 +26,7 @@ def test_decode_agv_info():
     code = pu.create_code(agv.to_json(), code_type='qr')
 
     decoded, found = detect.decode_agv_info(code)
-    decoded_agv = decoded[0]
+    decoded_agv = json_to_agv_info(decoded[0])
 
     assert(decoded_agv == agv)
     
