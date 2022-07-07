@@ -18,80 +18,19 @@ def place_pattern_on_img(pattern, img, pos):
     return img
 
 
-#TODO use generic zx scheme
 def create_code(data, size = 1000, code_type = 'aztec'):
     if code_type == 'qr':
         return _create_qr_code(data, size)
     elif code_type == 'aztec':
-        return _create_aztec_code_array(data, size)
+        return _create_aztec_code(data, size)
     else:
         raise RuntimeError(f'{code_type} is not a supported code type')
 
 
-# TODO replace with zx?
 def _create_qr_code(data, size):
-    '''
-    Creates a QR code representation of the given data as a numpy array.
-
-    Parameters
-    ----------
-
-    data:
-        the data to be encoded
-
-    size: optional
-        the length of the QR code square in pixels
-    '''
-    qr_size = round(size)
-    qr_code = pyqrcode.create(data)
-    qr_code = qr_code.text()
-    # remove all newlines
-    qr_code = qr_code.replace('\n', '')
-    # get total number of pixels (characters) from the QR Code string
-    size = len(qr_code)
-    # calculate image dimensions (qr code is square)
-    length = int(sqrt(size))
-    try:
-        qr_array = _create_qr_array(qr_code, length, size)
-    except ZeroDivisionError('Length of QR was 0'):
-        qr_array = _create_qr_array(qr_code, length, 1)
-    # scale up the QR code.
-    qr_array = cv2.resize(qr_array, (qr_size, qr_size),
-                          fx=0, fy=0, interpolation=cv2.INTER_AREA)
-    # apply border to QR code
-    # qr_array = cv2.copyMakeBorder(qr_array, 2, 2, 2, 2, cv2.BORDER_CONSTANT, value=0)
-
-    return qr_array
-
-
-def _create_qr_array(qr_string, length, size=1000):
-    '''
-    Reshape QR string into a `length * length` matrix
-    '''
-
-    scale = 1
-    qr_array = np.zeros([length, length], dtype='uint8')
-    row = column = 0
-
-    for char in qr_string:
-        if char == '0':
-            qr_array[row:row+(scale-1)][column:column+(scale-1)] = 255
-            column = column + scale
-
-        if char == '1':
-            qr_array[row:row+(scale-1)][column:column+(scale-1)] = 0
-            column = column + scale
-
-        if column == length:
-            row = row + scale
-            column = 0
-
-    return qr_array
-
-def _create_qr_code_zx(data, size):
     img = zx.write_barcode(zx.BarcodeFormat.QRCode, data, width=size, height=size) 
     return img
 
-def _create_aztec_code_array(data, size):
+def _create_aztec_code(data, size):
     img = zx.write_barcode(zx.BarcodeFormat.Aztec, data, width=size, height=size) 
     return img
