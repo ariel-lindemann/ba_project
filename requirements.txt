@@ -1,4 +1,4 @@
-numpy==1.21.2
+numpy==1.22.0
 opencv-contrib-python==4.5.3.56
 PyQRCode==1.2.1
 toml==0.10.2
