@@ -29,6 +29,9 @@ def find_aruco_markers(img, marker_size=DEFAULT_MARKER_SIZE, total_markers=250, 
 
 
 def decode(img):
+    '''
+    returns a 'zxingcpp.Result' object
+    '''
     #TODO multiple detection
     results = zx.read_barcode(img)
     if not results.valid:
