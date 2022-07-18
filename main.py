@@ -2,7 +2,6 @@ import cv2
 from cv2 import threshold
 from cv2 import THRESH_BINARY
 import numpy as np
-from sklearn import cluster
 import defaults
 
 import detect
@@ -12,9 +11,11 @@ from positioning import assess_position
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
-from cluster import cluster_dbscan, _threshold_img #TODO remove protected method
+from cluster import cluster_dbscan, _threshold_img, code_masks, draw_contours #TODO remove protected method
 
 from exceptions import InvalidBarcodeException
+
+from cluster import masked_img
 
 REQUIRED_POSITION = np.array([[100, 100], [800, 100], [800, 550], [100, 550]], np.int32)
 
@@ -64,7 +65,6 @@ def main():
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         threshold_img = _threshold_img(img)
 
-        dbscan_img = cluster_dbscan(threshold_img)
         #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
         try: 
@@ -77,14 +77,21 @@ def main():
         # position_correct = assess_position(REQUIRED_POSITION, found[0])
         position_box_color = (0, 0, 255) #TODO
         # if position_correct: position_box_color=(0, 255, 0)
-        cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
+        #cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
         cv2.putText(img, f'Decoded: {data}', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3, color=(0,255,0))
 
         # aligned_img = align(img, template_image , found, template_points)
 
         # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
-        img_concat = np.concatenate((img, threshold_img, dbscan_img), axis=0)
-        cv2.imshow('Aligned', img_concat)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 5)
+        thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)[1]
+        masked = masked_img(thresh)
+
+        draw_contours(img, code_masks(img)[0])
+
+        #img_concat = np.concatenate((img, thresh, masked), axis=0)
+        cv2.imshow('Aligned', img)
         print(data, found)
 
         if cv2.waitKey(STD_WAIT) == ord('q'):
