@@ -49,7 +49,7 @@ def cluster_dbscan(img, eps = 0.4, min_samples = 20):
     #TODO
 
 
-def code_masks(img, thr1=150, thr2=200):
+def _code_contours(img, thr1=150, thr2=200):
     '''
     returns the contours of areas where codes could be
     '''
@@ -74,7 +74,18 @@ def draw_contours(img, cnts):
         cv2.putText(img, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
 
-def image_segments(img, cnts):
+def masked_img(img):
+    thr1=150 
+    thr2=200
+    canny_img = cv2.Canny(img, thr1, thr2)
+    canny_blurred = cv2.GaussianBlur(canny_img, (101, 101), 0)
+    thresh = cv2.threshold(canny_blurred, 50, 255, cv2.THRESH_BINARY)[1]
+
+    masked_img = cv2.bitwise_and(img, img, mask=thresh)
+    return masked_img
+    
+
+def _image_segments_by_contours(img, cnts):
     imgs = []
     #TODO dynamic padding
     padding = 25
@@ -87,12 +98,7 @@ def image_segments(img, cnts):
     return imgs
 
 
-def masked_img(img):
-    thr1=150 
-    thr2=200
-    canny_img = cv2.Canny(img, thr1, thr2)
-    canny_blurred = cv2.GaussianBlur(canny_img, (101, 101), 0)
-    thresh = cv2.threshold(canny_blurred, 50, 255, cv2.THRESH_BINARY)[1]
-
-    masked_img = cv2.bitwise_and(img, img, mask=thresh)
-    return masked_img
+def image_segments(img):
+    cnts = _code_contours(img)
+    segments = _image_segments_by_contours(img, cnts)
+    return segments
