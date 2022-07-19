@@ -11,11 +11,11 @@ from positioning import assess_position
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
-from cluster import cluster_dbscan, _threshold_img, code_masks, draw_contours #TODO remove protected method
+from segment import cluster_dbscan, _threshold_img, code_masks, draw_contours #TODO remove protected method
 
 from exceptions import InvalidBarcodeException
 
-from cluster import masked_img
+from segment import masked_img
 
 REQUIRED_POSITION = np.array([[100, 100], [800, 100], [800, 550], [100, 550]], np.int32)
 
