@@ -11,7 +11,7 @@ from positioning import assess_position
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
-from segment import cluster_dbscan, _threshold_img, code_masks, draw_contours #TODO remove protected method
+from segment import cluster_dbscan, _threshold_img, _code_contours, draw_contours #TODO remove protected method
 
 from exceptions import InvalidBarcodeException
 
@@ -88,7 +88,7 @@ def main():
         thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)[1]
         masked = masked_img(thresh)
 
-        draw_contours(img, code_masks(img)[0])
+        draw_contours(img, _code_contours(img)[0])
 
         #img_concat = np.concatenate((img, thresh, masked), axis=0)
         cv2.imshow('Aligned', img)
