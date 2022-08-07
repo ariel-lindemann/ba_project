@@ -11,7 +11,7 @@ from positioning import assess_position
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
-from segment import cluster_dbscan, _threshold_img, _code_contours, draw_contours #TODO remove protected method
+from segment import _threshold_img, cluster_dbscan, _threshold_img_adaptive, _code_contours, draw_contours, image_segments #TODO remove protected method
 
 from exceptions import InvalidBarcodeException
 
@@ -62,8 +62,7 @@ def main():
             raise RuntimeError('Image capture unsuccessful')
 
 
-        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        threshold_img = _threshold_img(img)
+        threshold_img = _threshold_img_adaptive(img)
 
         #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
@@ -84,14 +83,28 @@ def main():
 
         # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 5)
-        thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)[1]
-        masked = masked_img(thresh)
+        #thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 5)
+        #thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)[1]
+        blur = 101
+        thresh = _threshold_img(img, blur=blur)
+        masked = masked_img(gray)
 
-        draw_contours(img, _code_contours(img)[0])
 
-        #img_concat = np.concatenate((img, thresh, masked), axis=0)
-        cv2.imshow('Aligned', img)
+        segment_big = np.zeros(gray.shape)
+        
+        try:
+            seg_1 = image_segments(gray)[0]
+            segment_big[0:seg_1.shape[0], 0:seg_1.shape[1]] = seg_1
+        
+        except IndexError:
+
+            seg_1 = segment_big
+        
+
+        #draw_contours(img, _code_contours(img)[0])
+
+        img_concat = np.concatenate((img, masked_img(img)), axis=0)
+        cv2.imshow('Aligned', img_concat)
         print(data, found)
 
         if cv2.waitKey(STD_WAIT) == ord('q'):
