@@ -3,46 +3,28 @@ import numpy as np
 
 from sklearn.cluster import DBSCAN
 
-
-#TODO 1 find the clusters
-# DBSCAN what are we looking for?
-# black points from the thresholded image
-#TODO 2 filter those who are not codes (squares)
-#TODO 3 find the box of the cluster
-#TODO 4 segment the image accordingly
-
-THRESHOLD_BLOCK_SIZE = 21
+THRESHOLD_BLOCK_SIZE = 51
 THRESHOLD_CONSTANT = 5
 
-def k_means_cluster(img, k):
-    #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # convert to RGB
-    pixels = img.reshape(-1,3) # reshape to 2D array
-    pixels = np.float32(pixels)
-
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 0.2)
-
-    ret, label, center = cv2.kmeans(pixels, k, 10, criteria, 0, cv2.KMEANS_PP_CENTERS)
-
-    center = np.uint8(center)
-    res = center[label.flatten()]
-    res2 = res.reshape(img.shape)
-
-    return res2, center
-
-
-def img_points_with_colors(img, color_value):
-    img_points = []
-
-    return 0
-
-def _threshold_img(img):
+def _threshold_img_adaptive(img, blur=101):
     canny_img = cv2.Canny(img, 150, 200)
-    threshold_img = cv2.adaptiveThreshold(canny_img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, THRESHOLD_BLOCK_SIZE, THRESHOLD_CONSTANT)
-    threshold_img = cv2.cvtColor(threshold_img, cv2.COLOR_GRAY2BGR)
+    canny_blurred = cv2.GaussianBlur(canny_img, (blur, blur), 0)
+    threshold_img = cv2.adaptiveThreshold(canny_blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, THRESHOLD_BLOCK_SIZE, THRESHOLD_CONSTANT)
+    #threshold_img = cv2.cvtColor(threshold_img, cv2.COLOR_GRAY2BGR)
     return threshold_img
 
+def _threshold_img(img, blur = 101):
+    thr1 = 150
+    thr2 = 200
+    canny_img = cv2.Canny(img, thr1, thr2)
+    canny_blurred = cv2.GaussianBlur(canny_img, (blur, blur), 0)
+    mask = cv2.threshold(canny_blurred, 50, 255, cv2.THRESH_BINARY)[1]
+
+    return mask
+
+
 def cluster_dbscan(img, eps = 0.4, min_samples = 20):
-    img = _threshold_img(img)
+    img = _threshold_img_adaptive(img)
     Z = np.float32(img.reshape((-1,3)))
     db = DBSCAN(eps= eps, min_samples=min_samples).fit(Z[:,:2])
     return np.uint8(db.labels_.reshape(img.shape[:2]))
@@ -55,10 +37,7 @@ def _code_contours(img, thr1=150, thr2=200):
     '''
     #TODO flexible parameters
     #TODO minimum size
-    canny_img = cv2.Canny(img, thr1, thr2)
-    canny_blurred = cv2.GaussianBlur(canny_img, (101, 101), 0)
-    mask = cv2.threshold(canny_blurred, 50, 255, cv2.THRESH_BINARY)[1]
-
+    mask = _threshold_img(img)
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     return cnts
@@ -85,10 +64,9 @@ def masked_img(img):
     return masked_img
     
 
-def _image_segments_by_contours(img, cnts):
+def _image_segments_by_contours(img, cnts, padding=25):
     imgs = []
     #TODO dynamic padding
-    padding = 25
 
     for (i, c) in enumerate(cnts):
         (x, y, w, h) = cv2.boundingRect(c)
@@ -99,6 +77,17 @@ def _image_segments_by_contours(img, cnts):
 
 
 def image_segments(img):
-    cnts = _code_contours(img)
+    cnts = _code_contours(img)[0]
     segments = _image_segments_by_contours(img, cnts)
     return segments
+
+# TODO replace with real positions of codes
+def segment_positions(img):
+    cnts = _code_contours(img)
+    points = []
+    for c in cnts:
+        # compute the center from contour moments
+        M = cv2.moments(c)
+        x = int(M['m10'] / M['m00'])
+        y = int(M['m01'] / M['m00'])
+        points.append((x, y))
