@@ -22,16 +22,6 @@ def distance(point_a, point_b):
     distance = np.sqrt(sum_square)
     return distance
 
-def top_left(img_points):
-    min_distance = np.integer.max
-    origin = np.array([0,0])
-    top_left_point = np.array()
-
-    for point in img_points:
-        if distance(point, origin) < min_distance : top_left_point = point
-
-    return top_left_point
-
 
 def handle_position_points(points):
     # if len(points) == 3:
@@ -39,7 +29,7 @@ def handle_position_points(points):
         # using the remaining 3
         # TODO  points = _add_fourth_point(points)
     if len(points) <= 2:
-        except TooFewPointsException
+        raise TooFewPointsException
     
     sorted_points = _sort_points(points)
     return sorted_points
