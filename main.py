@@ -7,7 +7,7 @@ import defaults
 import detect
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
 from alignment.alignment import align
-from positioning import assess_position
+from positioning import assess_position_distances
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
@@ -19,23 +19,6 @@ from segment import masked_img
 
 REQUIRED_POSITION = np.array([[100, 100], [800, 100], [800, 550], [100, 550]], np.int32)
 
-
-# TODO fix
-def assess_position(required, actual, tolerance=TOLERANCE):
-    if required.shape != actual.shape or actual:
-        return False
-
-    for i in range(required.size):
-        if required[i] - actual[i] > tolerance:
-            return False
-
-    return True
-
-def distance(point_a, point_b):
-    square = np.square(point_a - point_b)
-    sum_square = np.sum(square)
-    distance = np.sqrt(sum_square)
-    return distance
 
 def main():
 
