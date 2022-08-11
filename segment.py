@@ -83,11 +83,13 @@ def image_segments(img):
 
 # TODO replace with real positions of codes
 def segment_positions(img):
-    cnts = _code_contours(img)
-    points = []
-    for c in cnts:
+    cnts = _code_contours(img)[0]
+    points = np.zeros(len(cnts))
+    for (i, c) in enumerate(cnts):
         # compute the center from contour moments
         M = cv2.moments(c)
         x = int(M['m10'] / M['m00'])
         y = int(M['m01'] / M['m00'])
-        points.append((x, y))
+        points[i] = (x,y)
+
+    return points
