@@ -5,10 +5,8 @@ from defaults import TOLERANCE
 from exceptions import TooFewPointsException
 from segment import segment_positions
 
-# TODO rename
 
-
-def assess_position_distances(img, required, tolerance=TOLERANCE):
+def assess_position_abs_distances(img, required):
     # distance betweeen corresponding points
     actual = segment_positions(img)
     # order points
