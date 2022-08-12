@@ -7,17 +7,17 @@ import defaults
 import detect
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
 from alignment.alignment import align
-from positioning import assess_position_distances
+from positioning import assess_position_abs_distances
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
 from segment import _threshold_img, cluster_dbscan, _threshold_img_adaptive, _code_contours, draw_contours, image_segments #TODO remove protected method
 
-from exceptions import InvalidBarcodeException
+from exceptions import InvalidBarcodeException, TooFewPointsException
 
 from segment import masked_img
 
-REQUIRED_POSITION = np.array([[100, 100], [800, 100], [800, 550], [100, 550]], np.int32)
+REQUIRED_POSITION = np.array([[141,  12], [769,  32], [746, 416], [133, 416]])
 
 
 def main():
@@ -36,7 +36,6 @@ def main():
     dist_mtx = np.load(f'{PARAMS_DIR}/distortion_coefficients.npy')
 
     template_image = cv2.imread(ALIGNMENT_TEMPLATE_IMG_PATH)
-#    template_points, template_data = detect.find_markers(template_image, marker_type)[0]
 
     while True:
         success, img = cap.read()
@@ -46,7 +45,6 @@ def main():
 
 
         threshold_img = _threshold_img_adaptive(img)
-
         #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
         try: 
@@ -56,39 +54,36 @@ def main():
             data = 'Invalid code'
 
 
-        # position_correct = assess_position(REQUIRED_POSITION, found[0])
-        position_box_color = (0, 0, 255) #TODO
-        # if position_correct: position_box_color=(0, 255, 0)
-        #cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
-        cv2.putText(img, f'Decoded: {data}', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3, color=(0,255,0))
-
+        try:
+            distances = assess_position_abs_distances(img, REQUIRED_POSITION)
+        except TooFewPointsException:
+            distances = np.ones((4))*999
+        except ValueError:
+            distances = np.ones((4))*999
+            cv2.imwrite('error_causing.jpg', img)
         # aligned_img = align(img, template_image , found, template_points)
 
         # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        #thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 5)
-        #thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)[1]
-        blur = 101
-        thresh = _threshold_img(img, blur=blur)
-        masked = masked_img(gray)
-
 
         segment_big = np.zeros(gray.shape)
         
         try:
             seg_1 = image_segments(gray)[0]
             segment_big[0:seg_1.shape[0], 0:seg_1.shape[1]] = seg_1
-        
+            
         except IndexError:
-
             seg_1 = segment_big
-        
 
         #draw_contours(img, _code_contours(img)[0])
+        position_box_color = (0, 0, 255)  # TODO
+        cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
+        cv2.putText(img, f'Decoded: {data}', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3, color=(0, 255, 0))
 
         img_concat = np.concatenate((img, masked_img(img)), axis=0)
         cv2.imshow('Aligned', img_concat)
         print(data, found)
+        print(distances)
 
         if cv2.waitKey(STD_WAIT) == ord('q'):
             break
