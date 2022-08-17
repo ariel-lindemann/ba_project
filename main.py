@@ -4,7 +4,8 @@ from cv2 import THRESH_BINARY
 import numpy as np
 import defaults
 
-from flask import Flask, render_template, Response
+from flask import Flask, render_template
+from flask.wrappers import Response
 
 import detect
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
@@ -13,7 +14,7 @@ from positioning import assess_position_abs_distances
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
-from segment import _threshold_img, cluster_dbscan, _threshold_img_adaptive, _code_contours, draw_contours, image_segments #TODO remove protected method
+from segment import _threshold_img, cluster_dbscan, _threshold_img_adaptive, _code_contours, draw_contours, image_segments, masked_img #TODO remove protected method
 
 from exceptions import InvalidBarcodeException, TooFewPointsException
 
