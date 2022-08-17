@@ -43,6 +43,20 @@ def handle_position_points(points):
     return sorted_points
 
 
+def pos_to_dict(points):
+    '''
+    labels sorted points. Only works for 4 points
+    '''
+    if len(points) != 4:
+        raise TooFewPointsException
+    else:
+        tl = points[0]
+        tr = points[1]
+        br = points[2]
+        bl = points[3]
+        return {'TL':tl, 'TR':tr, 'BR': br, 'BL': bl}
+
+
 def _sort_points(points):
     # sort points based on x coordinates
     sorted_x = points[np.argsort(points[:, 0]), :]
