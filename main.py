@@ -1,17 +1,27 @@
 import cv2
+from cv2 import threshold
+from cv2 import THRESH_BINARY
 import numpy as np
+import defaults
 
 from flask import Flask, render_template, Response
 
 import detect
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
-from alignment import align
-from positioning import assess_position
+from alignment.alignment import align
+from positioning import assess_position_abs_distances
 
+<<<<<<< HEAD
 from defaults import DEFAULT_MARKER_SIZE, TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, TEMPLATE_IMG_PATH, STD_WAIT
+=======
+from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
+from calibration import agv_pattern, agv_info
+from segment import _threshold_img, cluster_dbscan, _threshold_img_adaptive, _code_contours, draw_contours, image_segments #TODO remove protected method
+>>>>>>> master
 
-REQUIRED_POSITION = np.array([[100, 100], [800, 100], [800, 550], [100, 550]], np.int32)
+from exceptions import InvalidBarcodeException, TooFewPointsException
 
+<<<<<<< HEAD
 app = Flask(__name__)
 
 video = cv2.VideoCapture(CAMERA_NUMBER)
@@ -33,23 +43,12 @@ def video_feed():
     global video
     return Response(gen(video),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+=======
+from segment import masked_img
+>>>>>>> master
 
-# TODO fix
-def assess_position(required, actual, tolerance=TOLERANCE):
-    if required.shape != actual.shape or actual:
-        return False
+REQUIRED_POSITION = np.array([[141,  12], [769,  32], [746, 416], [133, 416]])
 
-    for i in range(required.size):
-        if required[i] - actual[i] > tolerance:
-            return False
-
-    return True
-
-def distance(point_a, point_b):
-    square = np.square(point_a - point_b)
-    sum_square = np.sum(square)
-    distance = np.sqrt(sum_square)
-    return distance
 
 @app.route('/calibrate')
 def calibrate():
@@ -57,20 +56,21 @@ def calibrate():
     return 'Successfully calibrated'
 
 def main():
+
     cap = cv2.VideoCapture(CAMERA_NUMBER)
     marker_type = MARKER_TYPE
 
-    force_recalibration = True
+    force_recalibration = False
     camera_calibrated = is_calibrated()
 
     if not camera_calibrated or force_recalibration:
-        calibrate_camera(with_video=True)
+        #calibrate_camera(with_video=True)
+        print('Calibration sucessful')
 
     cal_mtx = np.load(f'{PARAMS_DIR}/calibration_matrix.npy')
     dist_mtx = np.load(f'{PARAMS_DIR}/distortion_coefficients.npy')
 
-    template_image = cv2.imread(TEMPLATE_IMG_PATH)
-    template_points = detect.find_markers(template_image, marker_type)[0]
+    template_image = cv2.imread(ALIGNMENT_TEMPLATE_IMG_PATH)
 
     while True:
         success, img = cap.read()
@@ -78,21 +78,47 @@ def main():
         if not success:
             raise RuntimeError('Image capture unsuccessful')
 
-        undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
-        data, found = detect.find_markers(img, marker_type)  # boxes and IDs of found markers
-        # position_correct = assess_position(REQUIRED_POSITION, found[0])
-        position_box_color = (0, 0, 255)
-        # if position_correct: position_box_color=(0, 255, 0)
-        cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
-        cv2.putText(img, f'{len(found[0])} Markers', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3, color=(0,255,0))
+        threshold_img = _threshold_img_adaptive(img)
+        #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
+        try: 
+            data, found = detect.find_markers(img, marker_type='aztec')  # boxes and IDs of found markers
+        except InvalidBarcodeException:
+            found = []
+            data = 'Invalid code'
+
+
+        try:
+            distances = assess_position_abs_distances(img, REQUIRED_POSITION)
+        except TooFewPointsException:
+            distances = np.ones((4))*999
+        except ValueError:
+            distances = np.ones((4))*999
+            cv2.imwrite('error_causing.jpg', img)
         # aligned_img = align(img, template_image , found, template_points)
 
         # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
-        # img_concat = np.concatenate((img, img), axis=0)
-        cv2.imshow('Aligned', undistorted_img)
-        print(found)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        segment_big = np.zeros(gray.shape)
+        
+        try:
+            seg_1 = image_segments(gray)[0]
+            segment_big[0:seg_1.shape[0], 0:seg_1.shape[1]] = seg_1
+            
+        except IndexError:
+            seg_1 = segment_big
+
+        #draw_contours(img, _code_contours(img)[0])
+        position_box_color = (0, 0, 255)  # TODO
+        cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
+        cv2.putText(img, f'Decoded: {data}', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3, color=(0, 255, 0))
+
+        img_concat = np.concatenate((img, masked_img(img)), axis=0)
+        cv2.imshow('Aligned', img_concat)
+        print(data, found)
+        print(distances)
 
         if cv2.waitKey(STD_WAIT) == ord('q'):
             break
