@@ -45,7 +45,8 @@ def handle_position_points(points):
 
 def pos_to_dict(points):
     '''
-    labels sorted points. Only works for 4 points
+    labels sorted points. Works for distances as well.
+    Only works for 4 elements
     '''
     if len(points) != 4:
         raise TooFewPointsException
