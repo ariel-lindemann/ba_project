@@ -6,6 +6,7 @@ import zxingcpp as zx
 
 from defaults import DEFAULT_MARKER_SIZE
 from calibration.agv_info import json_to_agv_info
+from segment import image_segments
 
 from exceptions import InvalidBarcodeException
 
@@ -66,3 +67,10 @@ def find_markers(img, marker_type):
 
 
     return data, found
+
+
+def find_multiple(img):
+    segments = image_segments(img)
+    
+    results = []
+    #TODO
