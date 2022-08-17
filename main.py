@@ -11,17 +11,12 @@ from calibration.camera_calibration import calibrate_camera, undistort, is_calib
 from alignment.alignment import align
 from positioning import assess_position_abs_distances
 
-<<<<<<< HEAD
-from defaults import DEFAULT_MARKER_SIZE, TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, TEMPLATE_IMG_PATH, STD_WAIT
-=======
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
 from segment import _threshold_img, cluster_dbscan, _threshold_img_adaptive, _code_contours, draw_contours, image_segments #TODO remove protected method
->>>>>>> master
 
 from exceptions import InvalidBarcodeException, TooFewPointsException
 
-<<<<<<< HEAD
 app = Flask(__name__)
 
 video = cv2.VideoCapture(CAMERA_NUMBER)
@@ -43,9 +38,6 @@ def video_feed():
     global video
     return Response(gen(video),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
-=======
-from segment import masked_img
->>>>>>> master
 
 REQUIRED_POSITION = np.array([[141,  12], [769,  32], [746, 416], [133, 416]])
 
