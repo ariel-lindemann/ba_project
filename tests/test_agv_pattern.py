@@ -30,4 +30,4 @@ def test_agv_pattern_correct():
         assert False, 'No data detected'
     for d in data:
         agv = json.loads(d)
-        assert agv['serial_no'] == 'test'
+        assert agv['serial_no'] == 'test'#TODO
