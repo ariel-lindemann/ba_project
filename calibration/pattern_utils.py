@@ -14,19 +14,15 @@ def place_pattern_on_img(pattern, img, pos):
     return img
 
 
-def create_code(data, size = 1000, code_type = 'aztec'):
+def create_code(data, size=1000, code_type='aztec'):
+    barcode_format = None
     if code_type == 'qr':
-        return _create_qr_code(data, size)
+        barcode_format = zx.BarcodeFormat.QRCode
     elif code_type == 'aztec':
-        return _create_aztec_code(data, size)
+        barcode_format = zx.BarcodeFormat.Aztec
+    elif code_type == 'datamatrix':
+        barcode_format = zx.BarcodeFormat.DataMatrix
     else:
         raise RuntimeError(f'{code_type} is not a supported code type')
 
-
-def _create_qr_code(data, size):
-    img = zx.write_barcode(zx.BarcodeFormat.QRCode, data, width=size, height=size) 
-    return img
-
-def _create_aztec_code(data, size):
-    img = zx.write_barcode(zx.BarcodeFormat.Aztec, data, width=size, height=size) 
-    return img
+    return zx.write_barcode(barcode_format, data, width=size, height=size)
