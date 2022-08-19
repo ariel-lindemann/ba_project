@@ -6,16 +6,19 @@ from exceptions import TooFewPointsException
 from segment import segment_positions
 
 
+def get_position_points(img):
+    unsorted = segment_positions(img=img)
+    return handle_position_points(unsorted)
+
 def assess_position_abs_distances(img, required):
-    # distance betweeen corresponding points
-    actual = segment_positions(img)
-    # order points
-    actual = handle_position_points(actual)
+    ''' 
+    distance betweeen corresponding points
+    '''
+    actual = get_position_points(img)
     # TODO handle TooFewPointsException
     distances = _compute_pairwise_distances(required, actual)
 
     return distances
-
 
 def _compute_pairwise_distances(points1: np.ndarray, points2: np.ndarray):
     '''
@@ -38,6 +41,21 @@ def handle_position_points(points):
 
     sorted_points = _sort_points(points)
     return sorted_points
+
+
+def pos_to_dict(points):
+    '''
+    labels sorted points. Works for distances as well.
+    Only works for 4 elements
+    '''
+    if len(points) != 4:
+        raise TooFewPointsException
+    else:
+        tl = points[0]
+        tr = points[1]
+        br = points[2]
+        bl = points[3]
+        return {'TL':tl, 'TR':tr, 'BR': br, 'BL': bl}
 
 
 def _sort_points(points):

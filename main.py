@@ -1,24 +1,70 @@
+import json
 import cv2
 from cv2 import threshold
 from cv2 import THRESH_BINARY
 import numpy as np
 import defaults
 
+from flask import Flask, render_template
+from flask.wrappers import Response
+
 import detect
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
 from alignment.alignment import align
-from positioning import assess_position_abs_distances
+from positioning import assess_position_abs_distances, get_position_points, pos_to_dict
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
-from segment import _threshold_img, cluster_dbscan, _threshold_img_adaptive, _code_contours, draw_contours, image_segments #TODO remove protected method
+from segment import _threshold_img, cluster_dbscan, _threshold_img_adaptive, _code_contours, draw_contours, image_segments, masked_img #TODO remove protected method
 
 from exceptions import InvalidBarcodeException, TooFewPointsException
 
-from segment import masked_img
+app = Flask(__name__)
+
+video = cv2.VideoCapture(CAMERA_NUMBER)
+position = None
+distances = None
 
 REQUIRED_POSITION = np.array([[141,  12], [769,  32], [746, 416], [133, 416]])
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+    
+def gen(video):
+    while True:
+        success, image = video.read()
+        ret, jpeg = cv2.imencode('.jpg', image)
+        frame = jpeg.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+               
+@app.route('/video_feed')
+def video_feed():
+    global video
+    return Response(gen(video),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/posiotion')
+def latest_position():
+    if position:
+        return pos_to_dict(position)
+    else:
+        return Response('Position could not be established', 500) #TODO should it be 404?
+
+
+@app.route('/distances')
+def latest_distances():
+    if distances:
+        return pos_to_dict(distances)
+    else:
+        return Response('Distances could not be measured', 500) #TODO should it be 404?
+
+
+@app.route('/calibrate')
+def calibrate():
+    calibrate_camera(with_video=True)
+    return 'Successfully calibrated'
 
 def main():
 
@@ -36,6 +82,7 @@ def main():
     dist_mtx = np.load(f'{PARAMS_DIR}/distortion_coefficients.npy')
 
     template_image = cv2.imread(ALIGNMENT_TEMPLATE_IMG_PATH)
+
 
     while True:
         success, img = cap.read()
@@ -75,6 +122,11 @@ def main():
         except IndexError:
             seg_1 = segment_big
 
+        try:
+            position = get_position_points(img)
+        except TooFewPointsException:
+            pass
+
         #draw_contours(img, _code_contours(img)[0])
         position_box_color = (0, 0, 255)  # TODO
         cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
@@ -92,5 +144,8 @@ def main():
     cv2.destroyAllWindows()
 
 
+
+
 if __name__ == '__main__':
+    #app.run()
     main()
