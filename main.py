@@ -122,7 +122,10 @@ def main():
         except IndexError:
             seg_1 = segment_big
 
-        position = get_position_points(img)
+        try:
+            position = get_position_points(img)
+        except TooFewPointsException:
+            pass
 
         #draw_contours(img, _code_contours(img)[0])
         position_box_color = (0, 0, 255)  # TODO
@@ -144,4 +147,5 @@ def main():
 
 
 if __name__ == '__main__':
-    app.run()
+    #app.run()
+    main()
