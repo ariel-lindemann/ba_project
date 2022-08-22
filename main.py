@@ -126,6 +126,8 @@ def main():
             position = get_position_points(img)
         except TooFewPointsException:
             pass
+        except ValueError:
+            cv2.imwrite('too_many_values_error.png', img)
 
         #draw_contours(img, _code_contours(img)[0])
         position_box_color = (0, 0, 255)  # TODO
