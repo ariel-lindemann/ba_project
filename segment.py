@@ -1,10 +1,14 @@
 import cv2
+from cv2 import contourArea
 import numpy as np
 
 from sklearn.cluster import DBSCAN
 
 THRESHOLD_BLOCK_SIZE = 51
 THRESHOLD_CONSTANT = 5
+
+#TODO dynamic size (based on code type)
+MIN_SEGMENT_AREA = 5000
 
 def _threshold_img_adaptive(img, blur=101):
     canny_img = cv2.Canny(img, 150, 200)
@@ -31,16 +35,22 @@ def cluster_dbscan(img, eps = 0.4, min_samples = 20):
     #TODO
 
 
-def _code_contours(img, thr1=150, thr2=200):
+def _code_contours(img, min_area=MIN_SEGMENT_AREA):
     '''
     returns the contours of areas where codes could be
     '''
     #TODO flexible parameters
     #TODO minimum size
     mask = _threshold_img(img)
-    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    return cnts
+    # filter out the ones which are too small
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        if area < min_area:
+            contours.drop(cnt)
+
+    return contours[(contourArea(contours) >= min_area)]
 
 
 def draw_contours(img, cnts):
