@@ -23,10 +23,10 @@ def _place_corner_codes(corner_codes, width, length, margin, border=0):
     # turn image white
     template[:, :] = 255
     # coordinates for each corner
-    tl_coordinates = [border, border]
-    tr_coordinates = [width - margin-border, border]
-    bl_coordinates = [border, length - margin-border]
-    br_coordinates = [width - margin - border, length - margin - border]
+    bl_coordinates = [border, border]
+    br_coordinates = [width - margin - border, border]
+    tl_coordinates = [border, length - margin-border]
+    tr_coordinates = [width - margin - border, length - margin - border]
 
     # draw the corner codes
     place_pattern_on_img(corner_codes['TL'], template, tl_coordinates)
