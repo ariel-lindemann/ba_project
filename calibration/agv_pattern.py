@@ -23,16 +23,16 @@ def _place_corner_codes(corner_codes, width, length, margin, border=0):
     # turn image white
     template[:, :] = 255
     # coordinates for each corner
-    ul_coordinates = [border, border]
-    ur_coordinates = [width - margin-border, border]
-    ll_coordinates = [border, length - margin-border]
-    lr_coordinates = [width - margin - border, length - margin - border]
+    tl_coordinates = [border, border]
+    tr_coordinates = [width - margin-border, border]
+    bl_coordinates = [border, length - margin-border]
+    br_coordinates = [width - margin - border, length - margin - border]
 
     # draw the corner codes
-    place_pattern_on_img(corner_codes['UL'], template, ul_coordinates)
-    place_pattern_on_img(corner_codes['UR'], template, ur_coordinates)
-    place_pattern_on_img(corner_codes['LL'], template, ll_coordinates)
-    place_pattern_on_img(corner_codes['LR'], template, lr_coordinates)
+    place_pattern_on_img(corner_codes['TL'], template, tl_coordinates)
+    place_pattern_on_img(corner_codes['TR'], template, tr_coordinates)
+    place_pattern_on_img(corner_codes['BL'], template, bl_coordinates)
+    place_pattern_on_img(corner_codes['BR'], template, br_coordinates)
 
     return template
 
@@ -65,7 +65,7 @@ def create_agv_template(agv_info: AgvInfo, pattern_size=100, code_type='aztec', 
 
     SCALING_FACTOR = dpi * 3.9370079
 
-    corners = ['UL', 'UR', 'LL', 'LR']
+    corners = ['TL', 'TR', 'BL', 'BR']
     corner_codes = {}
 
     for c in corners:
