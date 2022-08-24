@@ -84,7 +84,7 @@ def main():
     template_image = cv2.imread(ALIGNMENT_TEMPLATE_IMG_PATH)
 
 
-    while True:
+    while (cap.isOpened()):
         success, img = cap.read()
 
         if not success:
