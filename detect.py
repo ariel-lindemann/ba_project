@@ -3,6 +3,8 @@ from numpy.core.fromnumeric import shape
 import cv2.aruco as aruco
 import numpy as np
 import zxingcpp as zx
+import segment as seg
+import detect
 
 from defaults import DEFAULT_MARKER_SIZE
 from calibration.agv_info import json_to_agv_info
@@ -69,8 +71,20 @@ def find_markers(img, marker_type):
     return data, found
 
 
+def detected_results(img, with_threshold=False):
+    results = []
+
+    for s in seg.image_segments(img):
+        try:
+            results.append(detect.decode(s))
+        except InvalidBarcodeException:
+            pass
+
+    return results
+
+
 def find_multiple(img):
-    segments = image_segments(img)
+    segments = seg.image_segments(img)
     
     results = []
     #TODO
