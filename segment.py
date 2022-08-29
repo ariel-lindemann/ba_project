@@ -37,12 +37,13 @@ def cluster_dbscan(img, eps = 0.4, min_samples = 20):
 
 def _code_contours(img, min_area=MIN_SEGMENT_AREA):
     '''
-    returns the contours of areas where codes could be
+    returns the contours of areas where codes could be 
+    (only the contours, no hierarchies)
     '''
     #TODO flexible parameters
     #TODO minimum size
     mask = _threshold_img(img)
-    contours = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
 
     contours = _filter_by_min_area(contours, min_area)
 
