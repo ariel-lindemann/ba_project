@@ -8,7 +8,7 @@ THRESHOLD_BLOCK_SIZE = 51
 THRESHOLD_CONSTANT = 5
 
 #TODO dynamic size (based on code type)
-MIN_SEGMENT_AREA = 5000
+MIN_SEGMENT_AREA = 2500
 
 def _threshold_img_adaptive(img, blur=101):
     canny_img = cv2.Canny(img, 150, 200)
@@ -44,13 +44,20 @@ def _code_contours(img, min_area=MIN_SEGMENT_AREA):
     mask = _threshold_img(img)
     contours = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # filter out the ones which are too small
-    for cnt in contours:
-        area = cv2.contourArea(cnt)
-        if area < min_area:
-            contours.drop(cnt)
+    contours = _filter_by_min_area(contours, min_area)
 
-    return contours[(contourArea(contours) >= min_area)]
+    return contours
+
+
+def _filter_by_min_area(contours, min_area):
+    # filter out the ones which are too small
+    new_cnts = []
+    for c in contours:
+        area = cv2.contourArea(c)
+        if area >= min_area:
+            new_cnts.append(c)
+
+    return new_cnts
 
 
 def draw_contours(img, cnts):
