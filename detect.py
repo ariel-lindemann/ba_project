@@ -75,6 +75,9 @@ def detected_results(img, with_threshold=False):
     results = []
 
     for s in seg.image_segments(img):
+        if with_threshold:
+            s = cv2.adaptiveThreshold(cv2.cvtColor(s, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 5)
+
         try:
             results.append(detect.decode(s))
         except InvalidBarcodeException:
