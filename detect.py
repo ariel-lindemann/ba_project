@@ -31,11 +31,11 @@ def find_aruco_markers(img, marker_size=DEFAULT_MARKER_SIZE, total_markers=250, 
     return ids, b_boxes
 
 
-def decode(img):
+def decode_single(img):
     '''
-    returns a 'zxingcpp.Result' object
+    returns a `zxingcpp.Result` object.
+    For multiple detection use `find_markers`
     '''
-    #TODO multiple detection
     results = zx.read_barcode(img)
     if not results.valid:
         raise InvalidBarcodeException('Could not read barcode')
@@ -43,7 +43,7 @@ def decode(img):
 
 
 def decode_agv_info(img):
-    results = decode(img)
+    results = decode_single(img)
     #TODO needs to be changed (single responsibility)
     # we need the raw data as well as agv
     data = [results.text]
@@ -61,12 +61,11 @@ def find_markers(img, marker_type):
     data = []
     found = []
 
-    results = decode(img)
-    # TODO exception
+    results = detected_results(img)
 
-    data = [results.text]
-    found = [results.position]
-
+    for r in results:
+        data.append(r.text)
+        found.append(r.position)
 
     return data, found
 
@@ -79,7 +78,7 @@ def detected_results(img, with_threshold=False):
             s = cv2.adaptiveThreshold(cv2.cvtColor(s, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 5)
 
         try:
-            results.append(detect.decode(s))
+            results.append(detect.decode_single(s))
         except InvalidBarcodeException:
             pass
 
