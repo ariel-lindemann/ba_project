@@ -39,6 +39,6 @@ def test_create_aztec_code_array():
     img_path = 'tests/test_data/aztec_array.png'
     data = 'test_data'
     agv = AgvInfo(50, 50, 9, 2, 2, 'test').to_json()
-    img = pu._create_aztec_code(agv, 100)
+    img = pu.create_code(agv, 100, code_type='aztec')
     cv2.imwrite(img_path, img)
     assert (os.path.exists(img_path))

@@ -1,7 +1,6 @@
 # TODO move to different module?
 import cv2
 import numpy as np
-import zxingcpp as zx
 from calibration.pattern_utils import create_code, place_pattern_on_img
 from calibration.agv_info import AgvInfo
 
