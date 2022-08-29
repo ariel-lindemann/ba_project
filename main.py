@@ -9,6 +9,7 @@ from flask import Flask, render_template
 from flask.wrappers import Response
 
 import detect
+import visualisation as viz
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
 from alignment.alignment import align
 from positioning import assess_position_abs_distances, get_position_points, pos_to_dict
@@ -95,9 +96,9 @@ def main():
         #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
         try: 
-            data, found = detect.find_markers(img, marker_type='aztec')  # boxes and IDs of found markers
+            data, positions = detect.find_markers(img, marker_type='aztec')  # boxes and IDs of found markers
         except InvalidBarcodeException:
-            found = []
+            positions = []
             data = 'Invalid code'
 
 
@@ -132,11 +133,14 @@ def main():
         #draw_contours(img, _code_contours(img)[0])
         position_box_color = (0, 0, 255)  # TODO
         cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
-        cv2.putText(img, f'Decoded: {data}', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3, color=(0, 255, 0))
+        for p in positions:
+            viz.draw_result(img, p)
+            
+        cv2.putText(img, f'Decoded: {len(data)} codes', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=2, color=(0, 255, 0))
 
         img_concat = np.concatenate((img, masked_img(img)), axis=0)
         cv2.imshow('Aligned', img_concat)
-        print(data, found)
+        print(data, positions)
         print(distances)
 
         if cv2.waitKey(STD_WAIT) == ord('q'):
