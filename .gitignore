@@ -162,3 +162,6 @@ data/calibration_results/*.jpg
 data/*.jpg
 tests/test_data/*.jpg
 tests/test_data/*.png
+
+# Extension
+.VSCodeCounter/*
