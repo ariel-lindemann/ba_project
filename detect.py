@@ -42,32 +42,36 @@ def decode_single(img):
     return results
 
 
-def decode_agv_info(img):
-    results = decode_single(img)
-    #TODO needs to be changed (single responsibility)
-    # we need the raw data as well as agv
-    data = [results.text]
-    found = [results.position]
+def decode_agv_info(img, aruco=False):
+    if aruco:
+        data, found = find_aruco_markers(img)
+    else:
 
-    agv_data = []
+        results = decode_single(img)
+        #TODO needs to be changed (single responsibility)
+        # we need the raw data as well as agv
+        data = [results.text]
+        found = [results.position]
+    
+        agv_data = []
 
-    for i in data:
-        agv_data.append(json_to_agv_info(i))
+        for i in data:
+            agv_data.append(json_to_agv_info(i))
 
-    return data, found
+        return data, found
 
 
 def find_markers(img, marker_type):
     data = []
-    found = []
+    positions = []
 
     results = detected_results(img)
 
     for r in results:
         data.append(r.text)
-        found.append(r.position)
+        positions.append(r.position)
 
-    return data, found
+    return data, positions
 
 
 def detected_results(img, with_threshold=False):
@@ -81,6 +85,8 @@ def detected_results(img, with_threshold=False):
             results.append(detect.decode_single(s))
         except InvalidBarcodeException:
             pass
+        except IndexError:
+            cv2.imwrite('causing_index_error.jpg', img)
 
     return results
 
