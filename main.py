@@ -12,7 +12,7 @@ import detect
 import visualisation as viz
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
 from alignment.alignment import align
-from positioning import assess_position_abs_distances, get_position_points, pos_to_dict
+from positioning.positioning import assess_position_abs_distances, get_position_points, pos_to_dict
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info

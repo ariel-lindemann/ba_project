@@ -8,7 +8,7 @@ from segment import segment_positions
 
 def get_position_points(img):
     unsorted = segment_positions(img=img)
-    return handle_position_points(unsorted)
+    return _handle_position_points(unsorted)
 
 def assess_position_abs_distances(img, required):
     ''' 
@@ -31,7 +31,7 @@ def _compute_pairwise_distances(points1: np.ndarray, points2: np.ndarray):
     return distances
 
 
-def handle_position_points(points):
+def _handle_position_points(points):
     # if len(points) == 3:
     # if one point is missing we can infer it
     # using the remaining 3
