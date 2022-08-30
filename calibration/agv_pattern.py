@@ -64,8 +64,6 @@ def create_agv_template(agv_info: AgvInfo, pattern_size=100, code_type='aztec', 
     '''
 
     SCALING_FACTOR = dpi * 3.9370079
-    length = round(agv_info.length * SCALING_FACTOR)
-    width = round(agv_info.width * SCALING_FACTOR)
 
     corners = ['TL', 'TR', 'BL', 'BR']
     corner_codes = {}
@@ -75,7 +73,7 @@ def create_agv_template(agv_info: AgvInfo, pattern_size=100, code_type='aztec', 
             pattern_size * SCALING_FACTOR))  # TODO why 100?
         corner_codes.update([(c, c_code)])
 
-    template = create_template(corner_codes, pattern_size, border, dpi, img_path, write_file, width, length)
+    template = create_template(corner_codes, pattern_size, border, dpi, img_path, write_file, agv_info.width, agv_info.length)
 
     return template
 
