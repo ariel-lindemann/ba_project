@@ -1,4 +1,5 @@
 # TODO move to different module?
+from turtle import width
 import cv2
 import numpy as np
 from calibration.pattern_utils import create_code, place_pattern_on_img
@@ -63,6 +64,8 @@ def create_agv_template(agv_info: AgvInfo, pattern_size=100, code_type='aztec', 
     '''
 
     SCALING_FACTOR = dpi * 3.9370079
+    length = round(agv_info.length * SCALING_FACTOR)
+    width = round(agv_info.width * SCALING_FACTOR)
 
     corners = ['TL', 'TR', 'BL', 'BR']
     corner_codes = {}
@@ -72,16 +75,22 @@ def create_agv_template(agv_info: AgvInfo, pattern_size=100, code_type='aztec', 
             pattern_size * SCALING_FACTOR))  # TODO why 100?
         corner_codes.update([(c, c_code)])
 
-    length = round(agv_info.length * SCALING_FACTOR)
-    width = round(agv_info.width * SCALING_FACTOR)
+    template = create_template(corner_codes, pattern_size, border, dpi, img_path, write_file, width, length)
 
+    return template
+
+
+def create_template(corner_patterns, pattern_size=100, border=0, dpi=5, img_path=ALIGNMENT_TEMPLATE_IMG_PATH, write_file=True, width=380, length=560):
+
+    SCALING_FACTOR = dpi * 3.9370079
+    length = round(length * SCALING_FACTOR)
+    width = round(width * SCALING_FACTOR)
+
+    #TODO better name for variable `margin`
     # margin such that the corners of the square match the image corners
     margin = round(pattern_size * SCALING_FACTOR)
 
-    #TODO better name for variable `margin`
-    template = _place_corner_codes(
-        corner_codes, width, length, margin, border=border)
-    # save template to disk
+    template = _place_corner_codes(corner_patterns, width, length, margin, border=border)
     if write_file:
         cv2.imwrite(img_path, template)
     return template
