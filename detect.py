@@ -86,7 +86,7 @@ def detected_results(img, with_threshold=False):
         except InvalidBarcodeException:
             pass
         except IndexError:
-            cv2.imwrite('causing_index_error.jpg', img)
+            print('image only partially in frame')
 
     return results
 
