@@ -74,7 +74,7 @@ def _threshold_img_adaptive(img, blur=101):
     canny_img = cv2.Canny(img, 150, 200)
     canny_blurred = cv2.GaussianBlur(canny_img, (blur, blur), 0)
     threshold_img = cv2.adaptiveThreshold(canny_blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, THRESHOLD_BLOCK_SIZE, THRESHOLD_CONSTANT)
-    #threshold_img = cv2.cvtColor(threshold_img, cv2.COLOR_GRAY2BGR)
+    
     return threshold_img
 
 
