@@ -165,3 +165,6 @@ tests/test_data/*.png
 
 # Extension
 .VSCodeCounter/*
+
+# Error causing images
+data/error_causing_images/*

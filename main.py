@@ -108,7 +108,7 @@ def main():
             distances = np.ones((4))*999
         except ValueError:
             distances = np.ones((4))*999
-            cv2.imwrite('error_causing.jpg', img)
+            cv2.imwrite('data/error_causing_images/value_error_when_assessing_distance.jpg', img)
         # aligned_img = align(img, template_image , found, template_points)
 
         # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
@@ -128,7 +128,7 @@ def main():
         except TooFewPointsException:
             pass
         except ValueError:
-            cv2.imwrite('too_many_values_error.png', img)
+            cv2.imwrite('data/error_causing_images/too_many_values_error.png', img)
 
         #draw_contours(img, _code_contours(img)[0])
         position_box_color = (0, 0, 255)  # TODO
