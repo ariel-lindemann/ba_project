@@ -3,11 +3,13 @@ from scipy.spatial import distance as dist
 
 from defaults import TOLERANCE
 from exceptions import TooFewPointsException
-from segment import segment_positions, scale_parameter
+from segment import scale_parameter
+from detect import find_markers
 
 
 def get_position_points(img):
-    unsorted = segment_positions(img=img)
+    _, positions = find_markers(img)
+    unsorted = _zx_positions_centroids(positions)
     return _handle_position_points(unsorted)
 
 def assess_position_abs_distances(img, required):
@@ -36,6 +38,7 @@ def _handle_position_points(points):
     # if one point is missing we can infer it
     # using the remaining 3
     # TODO  points = _add_fourth_point(points)
+    # TODO adapt to ndarray points ?
     if len(points) <= 2:
         raise TooFewPointsException
 
@@ -101,10 +104,15 @@ def _zx_position_to_np(position):
     return np_points
 
 
-def _zx_position_centroids(points):
-    np_points = _zx_position_to_np(points)
-    centroid = _calculate_centroid(np_points)
-    return centroid
+def _zx_positions_centroids(positions):
+    '''
+    gives the centroids for a list of `zxingcpp.Position`
+    '''
+    centroids = np.zeros((len(positions), 2))
+    for (i, p) in enumerate(positions):
+        np_points = _zx_position_to_np(positions)
+        centroids[i] = _calculate_centroid(np_points)
+    return centroids
 
 
 def _calculate_centroid(points):
