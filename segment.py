@@ -10,29 +10,10 @@ THRESHOLD_CONSTANT = 5
 #TODO dynamic size (based on code type)
 MIN_SEGMENT_AREA = 2500
 
-def _threshold_img_adaptive(img, blur=101):
-    canny_img = cv2.Canny(img, 150, 200)
-    canny_blurred = cv2.GaussianBlur(canny_img, (blur, blur), 0)
-    threshold_img = cv2.adaptiveThreshold(canny_blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, THRESHOLD_BLOCK_SIZE, THRESHOLD_CONSTANT)
-    #threshold_img = cv2.cvtColor(threshold_img, cv2.COLOR_GRAY2BGR)
-    return threshold_img
-
-def _threshold_img(img, blur = 101):
-    thr1 = 150
-    thr2 = 200
-    canny_img = cv2.Canny(img, thr1, thr2)
-    canny_blurred = cv2.GaussianBlur(canny_img, (blur, blur), 0)
-    mask = cv2.threshold(canny_blurred, 50, 255, cv2.THRESH_BINARY)[1]
-
-    return mask
-
-
-def cluster_dbscan(img, eps = 0.4, min_samples = 20):
-    img = _threshold_img_adaptive(img)
-    Z = np.float32(img.reshape((-1,3)))
-    db = DBSCAN(eps= eps, min_samples=min_samples).fit(Z[:,:2])
-    return np.uint8(db.labels_.reshape(img.shape[:2]))
-    #TODO
+def image_segments(img):
+    cnts = _code_contours(img)
+    segments = _image_segments_by_contours(img, cnts)
+    return segments
 
 
 def _code_contours(img, min_area=MIN_SEGMENT_AREA):
@@ -50,6 +31,16 @@ def _code_contours(img, min_area=MIN_SEGMENT_AREA):
     return contours
 
 
+def _threshold_img(img, blur = 101):
+    thr1 = 150
+    thr2 = 200
+    canny_img = cv2.Canny(img, thr1, thr2)
+    canny_blurred = cv2.GaussianBlur(canny_img, (blur, blur), 0)
+    mask = cv2.threshold(canny_blurred, 50, 255, cv2.THRESH_BINARY)[1]
+
+    return mask
+
+
 def _filter_by_min_area(contours, min_area):
     # filter out the ones which are too small
     new_cnts = []
@@ -61,7 +52,36 @@ def _filter_by_min_area(contours, min_area):
     return new_cnts
 
 
-def draw_contours(img, cnts):
+
+def _image_segments_by_contours(img, cnts, padding=25):
+    imgs = []
+    #TODO dynamic padding
+
+    for (i, c) in enumerate(cnts):
+        (x, y, w, h) = cv2.boundingRect(c)
+        segment = img[(y-padding):(y+w+padding), (x-padding):(x+h+padding)]
+        imgs.append(segment)
+
+    return imgs
+
+
+def _threshold_img_adaptive(img, blur=101):
+    canny_img = cv2.Canny(img, 150, 200)
+    canny_blurred = cv2.GaussianBlur(canny_img, (blur, blur), 0)
+    threshold_img = cv2.adaptiveThreshold(canny_blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, THRESHOLD_BLOCK_SIZE, THRESHOLD_CONSTANT)
+    #threshold_img = cv2.cvtColor(threshold_img, cv2.COLOR_GRAY2BGR)
+    return threshold_img
+
+
+def cluster_dbscan(img, eps = 0.4, min_samples = 20):
+    img = _threshold_img_adaptive(img)
+    Z = np.float32(img.reshape((-1,3)))
+    db = DBSCAN(eps= eps, min_samples=min_samples).fit(Z[:,:2])
+    return np.uint8(db.labels_.reshape(img.shape[:2]))
+    #TODO
+
+
+def _draw_contours(img, cnts):
 
     for (i, c) in enumerate(cnts):
         (x, y, w, h) = cv2.boundingRect(c)
@@ -82,22 +102,6 @@ def masked_img(img):
     return masked_img
     
 
-def _image_segments_by_contours(img, cnts, padding=25):
-    imgs = []
-    #TODO dynamic padding
-
-    for (i, c) in enumerate(cnts):
-        (x, y, w, h) = cv2.boundingRect(c)
-        segment = img[(y-padding):(y+w+padding), (x-padding):(x+h+padding)]
-        imgs.append(segment)
-
-    return imgs
-
-
-def image_segments(img):
-    cnts = _code_contours(img)
-    segments = _image_segments_by_contours(img, cnts)
-    return segments
 
 # TODO replace with real positions of codes
 def segment_positions(img):
