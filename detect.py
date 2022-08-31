@@ -52,7 +52,7 @@ def decode_agv_info(img, aruco=False):
         # we need the raw data as well as agv
         data = [results.text]
         found = [results.position]
-    
+        
         agv_data = []
 
         for i in data:
@@ -61,7 +61,7 @@ def decode_agv_info(img, aruco=False):
         return data, found
 
 
-def find_markers(img, marker_type):
+def find_markers(img, marker_type=None):
     data = []
     positions = []
 
@@ -75,6 +75,9 @@ def find_markers(img, marker_type):
 
 
 def detected_results(img, with_threshold=False):
+    '''
+    returns a list of `zxing-cpp.Result` 
+    '''
     results = []
 
     for s in seg.image_segments(img):
