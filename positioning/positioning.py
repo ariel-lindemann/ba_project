@@ -3,7 +3,7 @@ from scipy.spatial import distance as dist
 
 from defaults import TOLERANCE
 from exceptions import TooFewPointsException
-from segment import segment_positions
+from segment import segment_positions, scale_parameter
 
 
 def get_position_points(img):
@@ -79,3 +79,46 @@ def _sort_points(points):
     (br, tr) = right_most[np.argsort(D)[::-1], :]
 
     return np.array([tl, tr, br, bl], dtype='float32')
+
+
+def _zx_position_to_np(position):
+    '''
+    convert points from zx.position to np array
+    '''
+    np_points = np.zeros((4, 2))
+    #TODO in order tl, tr, br, bl
+    zx_tl = position.top_left
+    zx_tr = position.top_right
+    zx_br = position.bottom_right
+    zx_bl = position.bottom_left
+
+    zx = [zx_tl, zx_tr, zx_br, zx_bl]
+
+    for (i, p) in enumerate(zx):
+        np_points[i, 0] = p.x
+        np_points[i, 1] = p.y
+
+    return np_points
+
+
+def _zx_position_centroids(points):
+    np_points = _zx_position_to_np(points)
+    centroid = _calculate_centroid(np_points)
+    return centroid
+
+
+def _calculate_centroid(points):
+    '''
+    calculate the centroid from a given set of points.
+    Points should be passed as `n x 2`-shaped np arrays (`n` being the number of points)
+    '''
+    x = [p[0] for p in points]
+    y = [p[1] for p in points]
+    centroid = (sum(x) // len(points), sum(y) // len(points))
+    return centroid
+
+
+def scale_points(img, points):
+    scale = scale_parameter(img)
+    points *= scale
+    return points
