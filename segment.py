@@ -31,6 +31,18 @@ def _code_contours(img, min_area=MIN_SEGMENT_AREA):
     return contours
 
 
+def _image_segments_by_contours(img, cnts, padding=25):
+    imgs = []
+    #TODO dynamic padding
+
+    for (i, c) in enumerate(cnts):
+        (x, y, w, h) = cv2.boundingRect(c)
+        segment = img[(y-padding):(y+w+padding), (x-padding):(x+h+padding)]
+        imgs.append(segment)
+
+    return imgs
+
+
 def _threshold_img(img, blur = 101):
     thr1 = 150
     thr2 = 200
@@ -50,19 +62,6 @@ def _filter_by_min_area(contours, min_area):
             new_cnts.append(c)
 
     return new_cnts
-
-
-
-def _image_segments_by_contours(img, cnts, padding=25):
-    imgs = []
-    #TODO dynamic padding
-
-    for (i, c) in enumerate(cnts):
-        (x, y, w, h) = cv2.boundingRect(c)
-        segment = img[(y-padding):(y+w+padding), (x-padding):(x+h+padding)]
-        imgs.append(segment)
-
-    return imgs
 
 
 def _threshold_img_adaptive(img, blur=101):
@@ -101,7 +100,6 @@ def masked_img(img):
     masked_img = cv2.bitwise_and(img, img, mask=thresh)
     return masked_img
     
-
 
 # TODO replace with real positions of codes
 def segment_positions(img):
