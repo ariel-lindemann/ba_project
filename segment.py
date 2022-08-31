@@ -124,12 +124,17 @@ def segment_positions(img):
 
     return points
 
-
 def _downscale_image(img, scale: int):
     return cv2.resize(img, (img.shape[1]//scale, img.shape[0]//scale))
 
 
 def _scale_to_aprox(img, desired=1000):
+    scale = scale_parameter(img, desired=desired)
+    img = _downscale_image(img, scale)
+    return img, scale
+
+
+def scale_parameter(img, desired=1000):
     height = img.shape[0]
     width = img.shape[1]
 
@@ -138,5 +143,4 @@ def _scale_to_aprox(img, desired=1000):
     else:
         scale = width//desired
 
-    img = _downscale_image(img, scale)
-    return img, scale
+    return scale
