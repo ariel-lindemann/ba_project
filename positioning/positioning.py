@@ -81,14 +81,14 @@ def _sort_points(points):
     # largest distance will be the BR point
     (br, tr) = right_most[np.argsort(D)[::-1], :]
 
-    return np.array([tl, tr, br, bl], dtype='float32')
+    return np.array([tl, tr, br, bl], dtype=np.int32)
 
 
 def _zx_position_to_np(position):
     '''
     convert points from zx.position to np array
     '''
-    np_points = np.zeros((4, 2))
+    np_points = np.zeros((4, 2), np.int32)
     #TODO in order tl, tr, br, bl
     zx_tl = position.top_left
     zx_tr = position.top_right
@@ -108,9 +108,9 @@ def _zx_positions_centroids(positions):
     '''
     gives the centroids for a list of `zxingcpp.Position`
     '''
-    centroids = np.zeros((len(positions), 2))
+    centroids = np.zeros((len(positions), 2), np.int32)
     for (i, p) in enumerate(positions):
-        np_points = _zx_position_to_np(positions)
+        np_points = _zx_position_to_np(p)
         centroids[i] = _calculate_centroid(np_points)
     return centroids
 
