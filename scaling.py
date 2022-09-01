@@ -1,7 +1,7 @@
 import cv2
 
 
-def scale_to_aprox(img, desired=1000):
+def scale_to_size(img, desired=1000):
     scale = scale_parameter(img, desired=desired)
     img = _downscale_image(img, scale)
     return img, scale

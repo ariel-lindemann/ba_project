@@ -1,7 +1,7 @@
 import cv2
 from cv2 import contourArea
 import numpy as np
-from scaling import scale_to_aprox
+from scaling import scale_to_size
 
 from sklearn.cluster import DBSCAN
 
@@ -13,7 +13,7 @@ MIN_SEGMENT_AREA = 2500
 
 def image_segments(img):
     # perform segmentation with downscaled img (faster)
-    downscaled, scale = scale_to_aprox(img)
+    downscaled, scale = scale_to_size(img)
     cnts = _code_contours(downscaled)
     padding = 25
     # use original image to get the segments
