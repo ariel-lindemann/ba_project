@@ -15,10 +15,13 @@ def image_segments(img):
     # perform segmentation with downscaled img (faster)
     downscaled, scale = scale_to_aprox(img)
     cnts = _code_contours(downscaled)
+    padding = 25
     # use original image to get the segments
     # pass the scale to adjust the coordinates
-    segments = _image_segments_by_contours(img, cnts, scale)
-    return segments
+    segments = _image_segments_by_contours(img, cnts, scale, padding)
+    
+    positions = segment_positions(downscaled, scale, padding)
+    return segments, positions
 
 
 def _code_contours(img, min_area=MIN_SEGMENT_AREA):
@@ -108,19 +111,16 @@ def masked_img(img):
     return masked_img
     
 
-# TODO replace with real positions of codes
-def segment_positions(img):
+def segment_positions(img, scale, padding):
+    '''
+    positions of the segments where codes are searched for
+    '''
     cnts = _code_contours(img)
-    points = np.zeros((len(cnts), 2))
+    points = np.zeros((len(cnts), 2), np.int32)
     for (i, c) in enumerate(cnts):
-        # compute the center from contour moments
-        M = cv2.moments(c)
-        try:
-            x = int(M['m10'] / M['m00'])
-            y = int(M['m01'] / M['m00'])
-        except ZeroDivisionError:
-            x, y = 0, 0
-
+        (x, y, _, _) = cv2.boundingRect(c)
+        x = (x+padding)*scale
+        y = (y+padding)*scale
         points[i] = (x,y)
 
     return points
