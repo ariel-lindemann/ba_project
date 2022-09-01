@@ -8,7 +8,7 @@ import detect
 
 from defaults import DEFAULT_MARKER_SIZE
 from calibration.agv_info import json_to_agv_info
-from segment import image_segments
+from parse_results import parse_result_position
 
 from exceptions import InvalidBarcodeException
 
@@ -65,11 +65,12 @@ def find_markers(img, marker_type=None):
     data = []
     positions = []
 
-    results = detected_results(img)
+    results, segment_positions = detected_results(img)
 
-    for r in results:
+    for (i, r) in enumerate(results):
         data.append(r.text)
-        positions.append(r.position)
+        pos = parse_result_position(r, segment_positions[i])
+        positions.append(pos)
 
     return data, positions
 
@@ -77,10 +78,13 @@ def find_markers(img, marker_type=None):
 def detected_results(img, with_threshold=False):
     '''
     returns a list of `zxing-cpp.Result` 
+    and positions of respective image segments
     '''
     results = []
 
-    for s in seg.image_segments(img):
+    segments, segment_positions = seg.image_segments(img)
+
+    for s in segments:
         if with_threshold:
             s = cv2.adaptiveThreshold(cv2.cvtColor(s, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 5)
 
@@ -91,4 +95,4 @@ def detected_results(img, with_threshold=False):
         except IndexError:
             print('image only partially in frame')
 
-    return results
+    return results, segment_positions
