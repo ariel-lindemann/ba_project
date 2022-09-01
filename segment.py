@@ -14,13 +14,13 @@ MIN_SEGMENT_AREA = 2500
 def image_segments(img):
     # perform segmentation with downscaled img (faster)
     downscaled, scale = scale_to_size(img)
-    cnts = _code_contours(downscaled)
+    cnts_of_downscaled = _code_contours(downscaled)
     padding = 25
     # use original image to get the segments
     # pass the scale to adjust the coordinates
-    segments = _image_segments_by_contours(img, cnts, scale, padding)
+    segments = _image_segments_by_contours(img, cnts_of_downscaled, scale, padding)
     
-    positions = segment_positions(downscaled, scale, padding)
+    positions = _segment_positions(cnts_of_downscaled, scale, padding)
     return segments, positions
 
 
@@ -111,11 +111,10 @@ def masked_img(img):
     return masked_img
     
 
-def segment_positions(img, scale, padding):
+def _segment_positions(cnts, scale, padding):
     '''
     positions of the segments where codes are searched for
     '''
-    cnts = _code_contours(img)
     points = np.zeros((len(cnts), 2), np.int32)
     for (i, c) in enumerate(cnts):
         (x, y, _, _) = cv2.boundingRect(c)
