@@ -89,16 +89,6 @@ def cluster_dbscan(img, eps = 0.4, min_samples = 20):
     #TODO
 
 
-def _draw_contours(img, cnts):
-
-    for (i, c) in enumerate(cnts):
-        (x, y, w, h) = cv2.boundingRect(c)
-        ((c_x, c_y), radius) = cv2.minEnclosingCircle(c)
-        #cv2.circle(img, (int(c_x), int(c_y)), int(radius), (0, 0, 255), 3)
-        cv2.rectangle(img, (x, y), ((x+w), (y+h)), (0,255,0), 3)
-        cv2.putText(img, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-
-
 def masked_img(img):
     thr1=150 
     thr2=200
