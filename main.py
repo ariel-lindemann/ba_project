@@ -101,7 +101,7 @@ def main():
         #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
         try: 
-            data, positions = detect.find_markers(img, marker_type='aztec')  # boxes and IDs of found markers
+            data, positions = detect.find_codes(img)  # text and position of found codes
         except InvalidBarcodeException:
             positions = []
             data = 'Invalid code'

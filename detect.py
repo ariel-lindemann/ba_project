@@ -61,7 +61,7 @@ def decode_agv_info(img, aruco=False):
         return data, found
 
 
-def find_markers(img, marker_type=None):
+def find_codes(img):
     data = []
     positions = []
 

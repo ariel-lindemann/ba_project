@@ -5,11 +5,11 @@ from scipy.spatial import distance as dist
 from defaults import TOLERANCE
 from exceptions import TooFewPointsException
 from scaling import scale_parameter
-from detect import find_markers
+from detect import find_codes
 
 
 def get_position_points(img):
-    _, unsorted_positions = find_markers(img)
+    _, unsorted_positions = find_codes(img)
     sorted_positions = pu.handle_position_points(unsorted_positions)
     return sorted_positions
 
