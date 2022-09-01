@@ -16,7 +16,7 @@ from positioning.positioning import assess_position_abs_distances, get_position_
 
 from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
-from segment import _threshold_img, cluster_dbscan, _threshold_img_adaptive, _code_contours, draw_contours, image_segments, masked_img #TODO remove protected method
+from segment import _threshold_img_adaptive, image_segments, masked_img #TODO remove protected method
 
 from exceptions import InvalidBarcodeException, TooFewPointsException
 
@@ -67,6 +67,11 @@ def calibrate():
     calibrate_camera(with_video=True)
     return 'Successfully calibrated'
 
+@app.route('/set_current_pos_as_required')
+def set_current_pos_as_required():
+    #TODO
+    pass
+
 def main():
 
     cap = cv2.VideoCapture(CAMERA_NUMBER)
@@ -114,27 +119,10 @@ def main():
         # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        segment_big = np.zeros(gray.shape)
-        
-        try:
-            seg_1 = image_segments(gray)[0]
-            segment_big[0:seg_1.shape[0], 0:seg_1.shape[1]] = seg_1
-            
-        except IndexError:
-            seg_1 = segment_big
-
-        try:
-            position = get_position_points(img)
-        except TooFewPointsException:
-            pass
-        except ValueError:
-            cv2.imwrite('data/error_causing_images/too_many_values_error.png', img)
-
         #draw_contours(img, _code_contours(img)[0])
         position_box_color = (0, 0, 255)  # TODO
         cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
-        for p in positions:
-            viz.draw_result(img, p)
+        viz.draw_points(img, positions)
             
         cv2.putText(img, f'Decoded: {len(data)} codes', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=2, color=(0, 255, 0))
 
