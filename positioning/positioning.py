@@ -9,10 +9,9 @@ from detect import find_markers
 
 
 def get_position_points(img):
-    _, positions = find_markers(img)
-    unsorted = pu.zx_positions_centroids(positions)
-    unsorted_scaled = scale_points(img, unsorted)
-    return pu.handle_position_points(unsorted_scaled)
+    _, unsorted_positions = find_markers(img)
+    sorted_positions = pu.handle_position_points(unsorted_positions)
+    return sorted_positions
 
 
 def assess_position_abs_distances(img, required):
