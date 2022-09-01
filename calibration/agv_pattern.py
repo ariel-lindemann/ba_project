@@ -1,5 +1,4 @@
 # TODO move to different module?
-from turtle import width
 import cv2
 import cv2.aruco as aruco
 import numpy as np
