@@ -12,7 +12,7 @@ def handle_position_points(points):
     if len(points) <= 2:
         raise TooFewPointsException
 
-    sorted_points = _sort_points(points)
+    sorted_points = _sort_points(np.array(points))
     return sorted_points
 
 
