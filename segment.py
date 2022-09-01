@@ -30,7 +30,6 @@ def _code_contours(img, min_area=MIN_SEGMENT_AREA):
     (only the contours, no hierarchies)
     '''
     #TODO flexible parameters
-    #TODO minimum size
     mask = _threshold_img(img)
     contours = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
 
@@ -44,7 +43,7 @@ def _image_segments_by_contours(img, cnts, scale=1, padding=25):
     #TODO dynamic padding
     padding *= scale
 
-    for (i, c) in enumerate(cnts):
+    for c in cnts:
         (x, y, w, h) = cv2.boundingRect(c)
         x, y, w, h = x*scale, y*scale, w*scale, h*scale
         segment = img[(y-padding):(y+w+padding), (x-padding):(x+h+padding)]
