@@ -24,6 +24,7 @@ def assess_position_abs_distances(img, required):
 
     return distances
 
+
 def _compute_pairwise_distances(points1: np.ndarray, points2: np.ndarray):
     '''
     points1: 4x2 ndarray
@@ -50,8 +51,9 @@ def pos_to_dict(points):
         bl = points[3]
         return {'TL':tl, 'TR':tr, 'BR': br, 'BL': bl}
 
+
 #TODO move to process results
-def scale_points(img, points):
+def _scale_points(img, points):
     scale = scale_parameter(img)
     points *= scale
     return points
