@@ -3,7 +3,7 @@ from scipy.spatial import distance as dist
 
 from defaults import TOLERANCE
 from exceptions import TooFewPointsException
-from segment import scale_parameter
+from scaling import scale_parameter
 from detect import find_markers
 
 
