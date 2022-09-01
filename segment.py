@@ -119,8 +119,8 @@ def segment_positions(img, scale, padding):
     points = np.zeros((len(cnts), 2), np.int32)
     for (i, c) in enumerate(cnts):
         (x, y, _, _) = cv2.boundingRect(c)
-        x = (x+padding)*scale
-        y = (y+padding)*scale
+        x = (x-padding)*scale
+        y = (y-padding)*scale
         points[i] = (x,y)
 
     return points
