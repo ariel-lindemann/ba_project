@@ -92,10 +92,3 @@ def detected_results(img, with_threshold=False):
             print('image only partially in frame')
 
     return results
-
-
-def find_multiple(img):
-    segments = seg.image_segments(img)
-    
-    results = []
-    #TODO
