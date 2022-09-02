@@ -65,7 +65,7 @@ def find_codes(img):
     data = []
     positions = []
 
-    results, segment_positions = detected_results(img)
+    results, segment_positions = _detected_results(img)
 
     for (i, r) in enumerate(results):
         data.append(r.text)
@@ -75,7 +75,7 @@ def find_codes(img):
     return data, positions
 
 
-def detected_results(img, with_threshold=False):
+def _detected_results(img, with_threshold=False):
     '''
     returns a list of `zxing-cpp.Result` 
     and positions of respective image segments
