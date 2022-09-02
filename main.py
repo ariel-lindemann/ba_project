@@ -103,7 +103,7 @@ def main():
         try: 
             data, positions = detect.find_codes(img)  # text and position of found codes
         except InvalidBarcodeException:
-            positions = []
+            positions = np.array([[]])
             data = 'Invalid code'
 
 

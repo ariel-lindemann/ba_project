@@ -8,11 +8,10 @@ def handle_position_points(points):
     # if one point is missing we can infer it
     # using the remaining 3
     # TODO  points = _add_fourth_point(points)
-    # TODO adapt to ndarray points ?
-    if len(points) <= 2:
+    if points.shape[0] <= 2:
         raise TooFewPointsException
 
-    sorted_points = _sort_points(np.array(points))
+    sorted_points = _sort_points(points)
     return sorted_points
 
 

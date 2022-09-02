@@ -62,15 +62,18 @@ def decode_agv_info(img, aruco=False):
 
 
 def find_codes(img):
-    data = []
-    positions = []
-
+    '''
+    returns the centers of detected codes in the image (`nx2` ndarray)
+    '''
     results, segment_positions = _detected_results(img)
+
+    data = []
+    positions = np.zeros((len(results), 2))
 
     for (i, r) in enumerate(results):
         data.append(r.text)
         pos = parse_result_position(r, segment_positions[i])
-        positions.append(pos)
+        positions[i] = pos
 
     return data, positions
 
