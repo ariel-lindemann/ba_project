@@ -66,10 +66,16 @@ def find_codes(img):
     positions = []
 
     results, segment_positions = _detected_results(img)
-
+    
+    skipped = 0
     for (i, r) in enumerate(results):
         data.append(r.text)
-        pos = parse_result_position(r, segment_positions[i])
+        try:
+            pos = parse_result_position(r, segment_positions[i+skipped])
+        except Exception:
+            skipped += 1
+            pos = parse_result_position(r, segment_positions[i+skipped])
+
         positions.append(pos)
 
     return data, positions
@@ -84,14 +90,14 @@ def _detected_results(img, with_threshold=False):
 
     segments, segment_positions = seg.image_segments(img)
 
-    for s in segments:
+    for (i, s) in enumerate(segments):
         if with_threshold:
             s = cv2.adaptiveThreshold(cv2.cvtColor(s, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 5)
 
         try:
             results.append(detect.decode_single(s))
         except InvalidBarcodeException:
-            pass
+            segment_positions[i] = [-1, -1]
         except IndexError:
             print('image only partially in frame\n Index Error in detect._detected_results()')
 

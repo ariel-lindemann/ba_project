@@ -2,6 +2,9 @@ from points_utils import zx_positions_centroids
 
 
 def parse_result_position(result, segment_position):
+    if segment_position[0] < 0:
+        raise Exception                 #TODO better exception
+    
     position = result.position
     position_center = zx_positions_centroids([position])[0]
     # determine position on the image (segment postion being the UL corner of the segment)
