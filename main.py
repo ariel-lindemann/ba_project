@@ -108,7 +108,7 @@ def main():
 
         #TODO aviod calculating points twice (maybe change discances function to accept points)
         try:
-            distances = assess_position_abs_distances(img, REQUIRED_POSITION)
+            distances = assess_position_abs_distances(positions, REQUIRED_POSITION)
         except TooFewPointsException:
             distances = np.ones((4))*999
         except ValueError:
