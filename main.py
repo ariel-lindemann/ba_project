@@ -92,6 +92,7 @@ def main():
 
     while (cap.isOpened()):
         success, img = cap.read()
+        old_img = img.copy()
 
         if not success:
             raise RuntimeError('Image capture unsuccessful')
@@ -128,8 +129,8 @@ def main():
         print(data, positions)
         print(distances)
 
-        if cv2.waitKey(STD_WAIT) == ord('q'):
-            cv2.imwrite('saved.jpg', img)
+        if cv2.waitKey(STD_WAIT) == ord('s'):
+            cv2.imwrite('saved.jpg', old_img)
 
         if cv2.waitKey(STD_WAIT) == ord('q'):
             break
