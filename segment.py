@@ -12,6 +12,9 @@ THRESHOLD_CONSTANT = 5
 MIN_SEGMENT_AREA = 2500
 
 def image_segments(img):
+    '''
+    returns image segments and their respectuve positions
+    '''
     # perform segmentation with downscaled img (faster)
     downscaled, scale = scale_to_size(img)
     cnts_of_downscaled = _code_contours(downscaled)
