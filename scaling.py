@@ -12,9 +12,9 @@ def scale_parameter(img, desired=1000):
     width = img.shape[1]
 
     if height > width:
-        scale = height//desired
+        scale = height//desired + 1
     else:
-        scale = width//desired
+        scale = width//desired + 1
 
     return scale
 
