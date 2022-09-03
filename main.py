@@ -96,8 +96,6 @@ def main():
         if not success:
             raise RuntimeError('Image capture unsuccessful')
 
-
-        threshold_img = _threshold_img_adaptive(img)
         #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
         try: 
@@ -107,6 +105,7 @@ def main():
             data = 'Invalid code'
 
 
+        #TODO aviod calculating points twice (maybe change discances function to accept points)
         try:
             distances = assess_position_abs_distances(img, REQUIRED_POSITION)
         except TooFewPointsException:
@@ -117,12 +116,10 @@ def main():
         # aligned_img = align(img, template_image , found, template_points)
 
         # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        #draw_contours(img, _code_contours(img)[0])
         position_box_color = (0, 0, 255)  # TODO
         cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
-        viz.draw_points(img, positions)
+        viz.draw_points(img, np.array(positions)) #TODO find alternative (deprecated)
             
         cv2.putText(img, f'Decoded: {len(data)} codes', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=2, color=(0, 255, 0))
 
@@ -130,6 +127,9 @@ def main():
         cv2.imshow('Aligned', img_concat)
         print(data, positions)
         print(distances)
+
+        if cv2.waitKey(STD_WAIT) == ord('q'):
+            cv2.imwrite('saved.jpg', img)
 
         if cv2.waitKey(STD_WAIT) == ord('q'):
             break
