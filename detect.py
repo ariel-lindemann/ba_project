@@ -72,7 +72,7 @@ def find_codes(img):
         data.append(r.text)
         try:
             pos = parse_result_position(r, segment_positions[i+skipped])
-        except Exception:
+        except InvalidBarcodeException:
             skipped += 1
             pos = parse_result_position(r, segment_positions[i+skipped])
 

@@ -1,9 +1,9 @@
 from points_utils import zx_positions_centroids
-
+from exceptions import InvalidBarcodeException
 
 def parse_result_position(result, segment_position):
     if segment_position[0] < 0:
-        raise Exception                 #TODO better exception
+        raise InvalidBarcodeException
     
     position = result.position
     position_center = zx_positions_centroids([position])[0]
