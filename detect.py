@@ -93,6 +93,6 @@ def _detected_results(img, with_threshold=False):
         except InvalidBarcodeException:
             pass
         except IndexError:
-            print('image only partially in frame')
+            print('image only partially in frame\n Index Error in detect._detected_results()')
 
     return results, segment_positions
