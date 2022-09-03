@@ -13,7 +13,7 @@ MIN_SEGMENT_AREA = 2500
 
 def image_segments(img):
     '''
-    returns image segments and their respectuve positions
+    returns image segments and their respective positions
     '''
     # perform segmentation with downscaled img (faster)
     downscaled, scale = scale_to_size(img)
