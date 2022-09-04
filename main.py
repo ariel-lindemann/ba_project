@@ -129,10 +129,11 @@ def main():
         print(data, positions)
         print(distances)
 
-        if cv2.waitKey(STD_WAIT) == ord('s'):
-            cv2.imwrite('saved.jpg', old_img)
+        pressed_key = cv2.waitKey(STD_WAIT) & 0xFF
 
-        if cv2.waitKey(STD_WAIT) == ord('q'):
+        if pressed_key == ord('s'):
+            cv2.imwrite('saved.jpg', old_img)
+        elif pressed_key == ord('q'):
             break
 
     cap.release()
