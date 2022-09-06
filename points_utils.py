@@ -44,7 +44,7 @@ def _zx_position_to_np(position):
     convert points from zx.position to np array
     '''
     np_points = np.zeros((4, 2), np.int32)
-    #TODO in order tl, tr, br, bl
+
     zx_tl = position.top_left
     zx_tr = position.top_right
     zx_br = position.bottom_right

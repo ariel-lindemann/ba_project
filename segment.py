@@ -89,7 +89,6 @@ def cluster_dbscan(img, eps = 0.4, min_samples = 20):
     Z = np.float32(img.reshape((-1,3)))
     db = DBSCAN(eps= eps, min_samples=min_samples).fit(Z[:,:2])
     return np.uint8(db.labels_.reshape(img.shape[:2]))
-    #TODO
 
 
 def masked_img(img):
