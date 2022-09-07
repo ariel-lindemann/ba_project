@@ -39,7 +39,7 @@ def _sort_points(points):
     return np.array([tl, tr, br, bl], dtype=np.int32)
 
 
-def _zx_position_to_np(position):
+def zx_position_to_np(position):
     '''
     convert points from zx.position to np array
     '''
@@ -65,7 +65,7 @@ def zx_positions_centroids(positions):
     '''
     centroids = np.zeros((len(positions), 2), np.int32)
     for (i, p) in enumerate(positions):
-        np_points = _zx_position_to_np(p)
+        np_points = zx_position_to_np(p)
         centroids[i] = _calculate_centroid(np_points)
     return centroids
 
