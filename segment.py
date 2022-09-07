@@ -11,14 +11,13 @@ THRESHOLD_CONSTANT = 5
 #TODO dynamic size (based on code type)
 MIN_SEGMENT_AREA = 2500
 
-def image_segments(img):
+def image_segments(img, padding=25):
     '''
     returns image segments and their respective positions
     '''
     # perform segmentation with downscaled img (faster)
     downscaled, scale = scale_to_size(img)
     cnts_of_downscaled = _code_contours(downscaled)
-    padding = 25
     # use original image to get the segments
     # pass the scale to adjust the coordinates
     segments = _image_segments_by_contours(img, cnts_of_downscaled, scale, padding)
@@ -49,7 +48,7 @@ def _image_segments_by_contours(img, cnts, scale=1, padding=25):
     for c in cnts:
         (x, y, w, h) = cv2.boundingRect(c)
         x, y, w, h = x*scale, y*scale, w*scale, h*scale
-        segment = img[(y-padding):(y+w+padding), (x-padding):(x+h+padding)]
+        segment = img[(y-padding):(y+h+padding), (x-padding):(x+w+padding)]
         imgs.append(segment)
 
     return imgs
