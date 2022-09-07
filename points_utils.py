@@ -1,7 +1,9 @@
 import numpy as np
 
+from scipy.spatial import distance as dist
 from calibration.agv_info import AgvInfo
 from exceptions import TooFewPointsException
+
 
 def handle_position_points(points):
     # if len(points) == 3:
@@ -90,7 +92,7 @@ def coordinates_from_agv_info(agv_info: AgvInfo, pattern_size=100):
     coordinates[0:3:2, 0:3:2, 0] = 0
     coordinates[0:3:2, 1:4:2, 0] = pattern_size
     coordinates[1:4:2, 0:3:2, 0] = length - pattern_size - 1
-    coordinates[1:4:2, 1:4:2, 0] = length  - 1
+    coordinates[1:4:2, 1:4:2, 0] = length - 1
     # y coordinates from top to bottom
     coordinates[0:2, 0:2, 1] = 0
     coordinates[0:2, 2:4, 1] = pattern_size
@@ -100,3 +102,13 @@ def coordinates_from_agv_info(agv_info: AgvInfo, pattern_size=100):
     coordinates = coordinates.reshape((16, 2))
     return coordinates
 
+
+def compute_pairwise_distances(points1: np.ndarray, points2: np.ndarray):
+    '''
+    points1: 4x2 ndarray
+    points2: 4x2 ndarray
+    '''
+    D = dist.cdist(points1, points2, 'euclidean')
+    # we don't need all the distances
+    distances = np.diagonal(D)
+    return distances

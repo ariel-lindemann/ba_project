@@ -1,6 +1,5 @@
 import numpy as np
 import points_utils as pu
-from scipy.spatial import distance as dist
 
 from defaults import TOLERANCE
 from exceptions import TooFewPointsException
@@ -20,19 +19,8 @@ def assess_position_abs_distances(actual, required):
     distance betweeen corresponding points
     '''
     # TODO handle TooFewPointsException
-    distances = _compute_pairwise_distances(required, actual)
+    distances = pu.compute_pairwise_distances(required, actual)
 
-    return distances
-
-
-def _compute_pairwise_distances(points1: np.ndarray, points2: np.ndarray):
-    '''
-    points1: 4x2 ndarray
-    points2: 4x2 ndarray
-    '''
-    D = dist.cdist(points1, points2, 'euclidean')
-    # we don't need all the distances
-    distances = np.diagonal(D)
     return distances
 
 
