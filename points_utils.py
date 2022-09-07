@@ -1,6 +1,5 @@
 import numpy as np
 
-from scipy.spatial import distance as dist
 from exceptions import TooFewPointsException
 
 def handle_position_points(points):
@@ -27,14 +26,9 @@ def _sort_points(points):
     # so we can grab the top-left and bottom-left points
     left_most = left_most[np.argsort(left_most[:, 1]), :]
     (tl, bl) = left_most
-
-    # now that we have the TL coordinate, use it
-    # to calculate the Euclidean distance between
-    # TL and right-most points
-    D = dist.cdist(tl[np.newaxis], right_most, 'euclidean')[0]
-    # by the Pythagorean theorem, the point with the
-    # largest distance will be the BR point
-    (br, tr) = right_most[np.argsort(D)[::-1], :]
+    # same for right-most
+    right_most = right_most[np.argsort(right_most[:, 1]), :]
+    (tr, br) = right_most
 
     return np.array([tl, tr, br, bl], dtype=np.int32)
 
