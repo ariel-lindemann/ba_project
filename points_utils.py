@@ -4,7 +4,6 @@ from scipy.spatial import distance as dist
 from calibration.agv_info import AgvInfo
 from exceptions import TooFewPointsException
 
-
 def handle_position_points(points):
     # if len(points) == 3:
     # if one point is missing we can infer it
@@ -78,7 +77,29 @@ def _calculate_centroid(points):
     return centroid
 
 
-def coordinates_from_agv_info(agv_info: AgvInfo, pattern_size=100):
+def centers_coordinates_from_agv_info(agv_info: AgvInfo, pattern_size=100):
+    '''
+    returns 4 points corresponding to the centers of the codes on the AGV. 
+    They are ordered clockwise (starting from top-left)
+    '''
+    length = agv_info.length
+    width = agv_info.width
+    half_pattern_size = pattern_size//2
+    coordinates = np.ones((4, 3), dtype=np.float32)
+
+    # x coordinates from left to right
+    coordinates[0:4:3, 0] = half_pattern_size
+    coordinates[1:3, 0] = length - half_pattern_size
+    # y coordinates from top to bottom
+    coordinates[0:2, 1] = half_pattern_size
+    coordinates[2:4, 1] = width - half_pattern_size
+    # z coordinates
+    coordinates[:, 2] = 0
+
+    return coordinates
+
+
+def corner_coordinates_from_agv_info(agv_info: AgvInfo, pattern_size=100):
     '''
     returns 16 points corresponding to the corners of the codes on the AGV. 
     They are ordered recursively clockwise (starting from top-left)
@@ -86,20 +107,22 @@ def coordinates_from_agv_info(agv_info: AgvInfo, pattern_size=100):
     length = agv_info.length
     width = agv_info.width
 
-    coordinates = np.ones((4, 4, 2))
+    coordinates = np.ones((4, 4, 3))
 
     # x coordinates from left to right
-    coordinates[0:3:2, 0:3:2, 0] = 0
-    coordinates[0:3:2, 1:4:2, 0] = pattern_size
-    coordinates[1:4:2, 0:3:2, 0] = length - pattern_size - 1
-    coordinates[1:4:2, 1:4:2, 0] = length - 1
+    coordinates[0:4:3, 0:4:3, 0] = 0
+    coordinates[0:4:3, 1:3, 0] = pattern_size
+    coordinates[1:3, 0:4:3, 0] = length - pattern_size - 1
+    coordinates[1:3, 1:3, 0] = length  - 1
     # y coordinates from top to bottom
     coordinates[0:2, 0:2, 1] = 0
     coordinates[0:2, 2:4, 1] = pattern_size
     coordinates[2:4, 0:2, 1] = width - pattern_size - 1
     coordinates[2:4, 2:4, 1] = width - 1
+    # z coordinates
+    coordinates[:, :, 2] = 0
 
-    coordinates = coordinates.reshape((16, 2))
+    coordinates = coordinates.reshape((16, 3))
     return coordinates
 
 
