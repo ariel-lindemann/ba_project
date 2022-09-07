@@ -90,14 +90,14 @@ def _detected_results(img, with_threshold=False):
 
     segments, segment_positions = seg.image_segments(img)
 
-    for (i, s) in enumerate(segments):
+    for s in segments:
         if with_threshold:
             s = cv2.adaptiveThreshold(cv2.cvtColor(s, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 5)
 
         try:
             results.append(detect.decode_single(s))
         except InvalidBarcodeException:
-            segment_positions[i] = [-1, -1]
+            s = [-1, -1]
         except IndexError:
             print('image only partially in frame\n Index Error in detect._detected_results()')
 
