@@ -17,7 +17,7 @@ def parse_result_position(result, segment_position):
     return (x, y)
 
 
-def corners_from_result(result, segment_position):
+def _corners_from_result(result, segment_position):
     '''
     returns the four corner coordinates of the `zxing-cpp.Result` with respect to the original image
     '''
@@ -44,9 +44,9 @@ def all_corners_from_results_list(results, segment_positions):
     corners = np.zeros((len(results) * 4, 2))
     for (i, r) in enumerate(results):
         try:
-            corners[i*4] = corners_from_result(r, segment_positions[i+skipped])
+            corners[i*4] = _corners_from_result(r, segment_positions[i+skipped])
         except InvalidBarcodeException:
             skipped += 1
-            corners[i*4] = corners_from_result(r, segment_positions[i+skipped])
+            corners[i*4] = _corners_from_result(r, segment_positions[i+skipped])
 
     return corners
