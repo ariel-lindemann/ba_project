@@ -1,7 +1,7 @@
 import numpy as np
 
 from scipy.spatial import distance as dist
-from calibration.agv_info import AgvInfo
+from calibration.agv_info import AgvInfo, json_to_agv_info
 from exceptions import TooFewPointsException
 
 def handle_position_points(points):
@@ -77,11 +77,15 @@ def _calculate_centroid(points):
     return centroid
 
 
-def centers_coordinates_from_agv_info(agv_info: AgvInfo, pattern_size=100):
+def centers_coordinates_from_agv_info(agv_info, pattern_size=100):
     '''
-    returns 4 points corresponding to the centers of the codes on the AGV. 
+    returns 4 points corresponding to the centers of the codes on the AGV 
+    (can be passed as `AgvInfo` or json string). 
     They are ordered clockwise (starting from top-left)
     '''
+    if isinstance(agv_info, str):
+        agv_info=json_to_agv_info(agv_info)
+    
     length = agv_info.length
     width = agv_info.width
     half_pattern_size = pattern_size//2
