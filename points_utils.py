@@ -10,7 +10,7 @@ def handle_position_points(points):
     # using the remaining 3
     # TODO  points = _add_fourth_point(points)
     # TODO adapt to ndarray points ?
-    if len(points) <= 2:
+    if len(points) < 4:
         raise TooFewPointsException
 
     sorted_points = _sort_points(np.array(points))

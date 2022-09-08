@@ -12,7 +12,7 @@ import detect
 import visualisation as viz
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
 from alignment.alignment import align
-from positioning.positioning import calculate_abs_distances_in_mm, get_position_points, pos_to_dict
+from positioning.positioning import calculate_abs_distances_in_mm, get_data_and_position_points, pos_to_dict
 
 from defaults import CALIBRATION_RESULTS_PATH, TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
@@ -100,7 +100,7 @@ def main():
         #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
 
         try: 
-            data, positions = detect.find_codes(img)  # text and position of found codes
+            data, positions = get_data_and_position_points(img)# text and position of found codes
         except InvalidBarcodeException:
             positions = []
             data = 'Invalid code'
@@ -109,7 +109,7 @@ def main():
         #TODO aviod calculating points twice (maybe change discances function to accept points)
         try:
             distances = calculate_abs_distances_in_mm(positions, REQUIRED_POSITION, data[0])
-        except TooFewPointsException:
+        except (TooFewPointsException, IndexError):
             distances = np.ones((4))*999
         except ValueError:
             distances = np.ones((4))*999

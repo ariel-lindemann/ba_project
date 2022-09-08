@@ -9,10 +9,13 @@ from detect import find_codes
 
 
 #TODO find a way to use (only once)
-def get_position_points(img):
-    _, unsorted_positions = find_codes(img)
-    sorted_positions = pu.handle_position_points(unsorted_positions)
-    return sorted_positions
+def get_data_and_position_points(img):
+    data, unsorted_positions = find_codes(img)
+    try:
+        sorted_positions = pu.handle_position_points(unsorted_positions)
+    except TooFewPointsException:
+        sorted_positions = np.array(unsorted_positions) #TODO pu.handle_too_few_points(unsorted_positions, data) 
+    return data, sorted_positions
 
 
 def calculate_abs_distances_in_mm(actual, required, data):
