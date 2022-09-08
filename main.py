@@ -12,7 +12,7 @@ import detect
 import visualisation as viz
 from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
 from alignment.alignment import align
-from positioning.positioning import assess_position_abs_distances, get_position_points, pos_to_dict
+from positioning.positioning import calculate_abs_distances_in_mm, get_position_points, pos_to_dict
 
 from defaults import CALIBRATION_RESULTS_PATH, TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
@@ -108,13 +108,12 @@ def main():
 
         #TODO aviod calculating points twice (maybe change discances function to accept points)
         try:
-            distances = assess_position_abs_distances(positions, REQUIRED_POSITION)
+            distances = calculate_abs_distances_in_mm(positions, REQUIRED_POSITION, data[0])
         except TooFewPointsException:
             distances = np.ones((4))*999
         except ValueError:
             distances = np.ones((4))*999
             cv2.imwrite('data/error_causing_images/value_error_when_assessing_distance.jpg', img)
-        # aligned_img = align(img, template_image , found, template_points)
 
         # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
 

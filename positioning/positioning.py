@@ -15,15 +15,20 @@ def get_position_points(img):
     return sorted_positions
 
 
-def assess_position_abs_distances(actual, required):
+def calculate_abs_distances_in_mm(actual, required, data):
     ''' 
-    distance betweeen corresponding points
+    distance betweeen corresponding points.
     '''
     # TODO handle TooFewPointsException
+    actual = get_transformed_points(actual, data)
+    mm_per_pixel = _calculate_mm_per_pixel(actual, required)
+    actual = mm_per_pixel * actual.astype(np.float64)
     distances = pu.compute_pairwise_distances(required, actual)
 
     return distances
 
+
+#TODO affine transform
 
 #TODO move to process results
 def pos_to_dict(points):
@@ -57,3 +62,15 @@ def get_transformed_points(detected_points, detected_data):
         detected_points, agv_coordinates)
     transformed = p_tran.transform_points(detected_points, M)
     return transformed
+
+
+def _calculate_mm_per_pixel(detected_points, agv_coordinates):
+    '''
+    gives the metric of mm per pixels. Expects detected points (transformed),  
+    agv corner coordinates. Points MUST be sorted clockwise beginning at TL
+    '''
+    agv_length=agv_coordinates[1, 0] - agv_coordinates[0, 0]        # mm
+    measured_length=detected_points[1, 0] - detected_points[0, 0]   # pixels
+
+    mm_per_pixel = agv_length/measured_length
+    return mm_per_pixel
