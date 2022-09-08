@@ -14,7 +14,7 @@ from calibration.camera_calibration import calibrate_camera, undistort, is_calib
 from alignment.alignment import align
 from positioning.positioning import assess_position_abs_distances, get_position_points, pos_to_dict
 
-from defaults import TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
+from defaults import CALIBRATION_RESULTS_PATH, TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
 from calibration import agv_pattern, agv_info
 from segment import _threshold_img_adaptive, image_segments, masked_img #TODO remove protected method
 
@@ -75,17 +75,17 @@ def set_current_pos_as_required():
 def main():
 
     cap = cv2.VideoCapture(CAMERA_NUMBER)
-    marker_type = MARKER_TYPE
 
     force_recalibration = False
     camera_calibrated = is_calibrated()
 
     if not camera_calibrated or force_recalibration:
-        #calibrate_camera(with_video=True)
+        print('Calibrating camera ...')
+        calibrate_camera(with_video=False)
         print('Calibration sucessful')
 
-    cal_mtx = np.load(f'{PARAMS_DIR}/calibration_matrix.npy')
-    dist_mtx = np.load(f'{PARAMS_DIR}/distortion_coefficients.npy')
+    cam_mtx = np.load(f'{PARAMS_DIR}/calibration_matrix.npy')
+    dist_vecs = np.load(f'{PARAMS_DIR}/distortion_coefficients.npy')
 
     template_image = cv2.imread(ALIGNMENT_TEMPLATE_IMG_PATH)
 
