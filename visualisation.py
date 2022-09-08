@@ -24,10 +24,10 @@ def draw_distance_lines(img, points1, points2):
 
     return lines_img
 
-def draw_points(img, points, font_size=20):
+def draw_points(img, points, font_size=10):
     for i in range(points.shape[0]):
-        x = points[i][0]
-        y = points[i][1]
+        x = points[i][0].astype(np.int32)
+        y = points[i][1].astype(np.int32)
         cv2.putText(img, str(i), (x,y), cv2.FONT_HERSHEY_PLAIN, font_size, color=(0, 0, 255), thickness=5)
-        cv2.circle(img, (x,y), 50, (0, 255, 0), 10)
+        cv2.circle(img, (x,y), 5, (0, 255, 0), 10)
     return img
