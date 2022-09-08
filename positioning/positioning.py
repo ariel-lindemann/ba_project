@@ -1,5 +1,6 @@
 import numpy as np
 import points_utils as pu
+import positioning.perspective_transform as p_tran
 
 from defaults import TOLERANCE
 from exceptions import TooFewPointsException
@@ -45,3 +46,14 @@ def _scale_points(img, points):
     scale = scale_parameter(img)
     points *= scale
     return points
+
+
+def get_transformed_points(detected_points, detected_data):
+    '''
+    get position of the AGV with regard to its plane
+    '''
+    agv_coordinates = pu.centers_coordinates_from_agv_info(detected_data)
+    M = p_tran.get_simple_perspective_transform(
+        detected_points, agv_coordinates)
+    transformed = p_tran.transform_points(detected_points, M)
+    return transformed
