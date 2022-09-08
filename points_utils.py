@@ -79,7 +79,7 @@ def _calculate_centroid(points):
 
 def centers_coordinates_from_agv_info(agv_info, pattern_size=100):
     '''
-    returns 4 points corresponding to the centers of the codes on the AGV 
+    returns 4 2d points corresponding to the centers of the codes on the AGV 
     (can be passed as `AgvInfo` or json string). 
     They are ordered clockwise (starting from top-left)
     '''
@@ -89,7 +89,7 @@ def centers_coordinates_from_agv_info(agv_info, pattern_size=100):
     length = agv_info.length
     width = agv_info.width
     half_pattern_size = pattern_size//2
-    coordinates = np.ones((4, 3), dtype=np.float32)
+    coordinates = np.ones((4, 2), dtype=np.float32)
 
     # x coordinates from left to right
     coordinates[0:4:3, 0] = half_pattern_size
@@ -97,21 +97,19 @@ def centers_coordinates_from_agv_info(agv_info, pattern_size=100):
     # y coordinates from top to bottom
     coordinates[0:2, 1] = half_pattern_size
     coordinates[2:4, 1] = width - half_pattern_size
-    # z coordinates
-    coordinates[:, 2] = 0
 
     return coordinates
 
 
 def corner_coordinates_from_agv_info(agv_info: AgvInfo, pattern_size=100):
     '''
-    returns 16 points corresponding to the corners of the codes on the AGV. 
+    returns 16 2d points corresponding to the corners of the codes on the AGV. 
     They are ordered recursively clockwise (starting from top-left)
     '''
     length = agv_info.length
     width = agv_info.width
 
-    coordinates = np.ones((4, 4, 3))
+    coordinates = np.ones((4, 4, 2))
 
     # x coordinates from left to right
     coordinates[0:4:3, 0:4:3, 0] = 0
@@ -123,10 +121,8 @@ def corner_coordinates_from_agv_info(agv_info: AgvInfo, pattern_size=100):
     coordinates[0:2, 2:4, 1] = pattern_size
     coordinates[2:4, 0:2, 1] = width - pattern_size - 1
     coordinates[2:4, 2:4, 1] = width - 1
-    # z coordinates
-    coordinates[:, :, 2] = 0
 
-    coordinates = coordinates.reshape((16, 3))
+    coordinates = coordinates.reshape((16, 2))
     return coordinates
 
 
