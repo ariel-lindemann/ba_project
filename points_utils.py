@@ -16,6 +16,17 @@ def handle_position_points(points):
     sorted_points = _sort_points(np.array(points))
     return sorted_points
 
+def handle_too_few_points(points, data):
+    returned_points = np.ones((4, 2)) * (-1)
+    for (i, p) in points:
+        corner = json_to_agv_info(data[i]).corner
+        index = -1
+    
+    # TODO check corner texts
+
+
+
+
 
 def _sort_points(points):
     # sort points based on x coordinates
@@ -79,7 +90,7 @@ def _calculate_centroid(points):
 
 def centers_coordinates_from_agv_info(agv_info, pattern_size=100):
     '''
-    returns 4 2d points corresponding to the centers of the codes on the AGV 
+    returns 4 3d points corresponding to the centers of the codes on the AGV 
     (can be passed as `AgvInfo` or json string). 
     They are ordered clockwise (starting from top-left)
     '''
@@ -89,7 +100,7 @@ def centers_coordinates_from_agv_info(agv_info, pattern_size=100):
     length = agv_info.length
     width = agv_info.width
     half_pattern_size = pattern_size//2
-    coordinates = np.ones((4, 2), dtype=np.float32)
+    coordinates = np.ones((4, 3), dtype=np.float32)
 
     # x coordinates from left to right
     coordinates[0:4:3, 0] = half_pattern_size
@@ -97,6 +108,8 @@ def centers_coordinates_from_agv_info(agv_info, pattern_size=100):
     # y coordinates from top to bottom
     coordinates[0:2, 1] = half_pattern_size
     coordinates[2:4, 1] = width - half_pattern_size
+    # z coordinates
+    coordinates[:, 2] = 0
 
     return coordinates
 

@@ -60,7 +60,7 @@ def get_transformed_points(detected_points, detected_data):
     '''
     get position of the AGV with regard to its plane
     '''
-    agv_coordinates = pu.centers_coordinates_from_agv_info(detected_data)
+    agv_coordinates = pu.centers_coordinates_from_agv_info(detected_data)[:2, :] # only 2d needed
     M = p_tran.get_simple_perspective_transform(
         detected_points, agv_coordinates)
     transformed = p_tran.transform_points(detected_points, M)
