@@ -6,6 +6,9 @@ from defaults import PARAMS_DIR
 
 
 def get_simple_perspective_transform(obj_coordinates, img_coordinates):
+    '''
+    expects two `4x2` ndarrays
+    '''
     pu._sort_points(obj_coordinates)
     pu._sort_points(img_coordinates)
 
@@ -42,3 +45,22 @@ def transform_points(points, transformation_matrix):
     transformed_points = cv2.perspectiveTransform(points, transformation_matrix)
     transformed_points = transformed_points[0].astype(np.int32)
     return transformed_points
+
+
+def p3p(obj_points, img_points, cam_mtx=None, dst_vecs=None):
+    '''
+    obj_points: 
+
+    img_points: `4x2` shape
+    '''
+    if not cam_mtx:
+        cam_mtx = np.load(f'{PARAMS_DIR}/calibration_matrix.npy')
+    if not dst_vecs:
+        dst_vecs = np.load(f'{PARAMS_DIR}/distortion_coefficients.npy')
+    
+    obj_points = obj_points.astype('double')
+    img_points = img_points.astype('double')
+
+    retval, rvecs, tvecs = cv2.solveP3P(obj_points, img_points, cam_mtx, dst_vecs, cv2.SOLVEPNP_P3P)
+
+    return retval, rvecs, tvecs
