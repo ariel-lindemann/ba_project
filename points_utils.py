@@ -148,3 +148,15 @@ def compute_pairwise_distances(points1: np.ndarray, points2: np.ndarray):
     # we don't need all the distances
     distances = np.diagonal(D)
     return distances
+
+
+def calculate_x_and_y_distances_pairwise(positions1: np.ndarray, positions2: np.ndarray):
+    '''
+    positions 1 : n x 2 
+    positions 2 : n x 2 
+
+    Both sets of positions must be sorted
+    '''
+    x_distances = positions1[:, 0] - positions2[:, 0]
+    y_distances = positions1[:, 1] - positions2[:, 1]
+    return x_distances, y_distances
