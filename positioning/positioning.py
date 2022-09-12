@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import points_utils as pu
 import positioning.perspective_transform as p_tran
@@ -20,15 +21,16 @@ def get_data_and_position_points(img):
 
 def calculate_abs_distances_in_mm(actual, required, data):
     ''' 
-    distance betweeen corresponding points.
+    x and y distance betweeen corresponding points.
     '''
     # TODO handle TooFewPointsException
-    actual = get_transformed_points(actual, data)
-    mm_per_pixel = _calculate_mm_per_pixel(actual, required)
+    length = json.loads(data)['length']
+    #actual = get_transformed_points(actual, data)
+    mm_per_pixel = _calculate_mm_per_pixel(actual, length)
     actual = mm_per_pixel * actual.astype(np.float64)
-    distances = pu.compute_pairwise_distances(required, actual)
+    x_distances, y_distances = pu.calculate_x_and_y_distances_pairwise(required, actual)
 
-    return distances
+    return x_distances, y_distances, mm_per_pixel
 
 
 #TODO affine transform
@@ -67,12 +69,11 @@ def get_transformed_points(detected_points, detected_data):
     return transformed
 
 
-def _calculate_mm_per_pixel(detected_points, agv_coordinates):
+def _calculate_mm_per_pixel(detected_points, agv_length):
     '''
     gives the metric of mm per pixels. Expects detected points (transformed),  
-    agv corner coordinates. Points MUST be sorted clockwise beginning at TL
+    and actual agv length. Points MUST be sorted clockwise beginning at TL
     '''
-    agv_length=agv_coordinates[1, 0] - agv_coordinates[0, 0]        # mm
     measured_length=detected_points[1, 0] - detected_points[0, 0]   # pixels
 
     mm_per_pixel = agv_length/measured_length
