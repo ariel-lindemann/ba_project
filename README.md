@@ -37,3 +37,4 @@ take those images itself.
 
 ### Functionality
 
+To see a complete overview of the endpoints, run the application and then visit `localhost:8000/docs`
