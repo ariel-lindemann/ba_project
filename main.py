@@ -1,146 +1,195 @@
-import json
+from collections import OrderedDict
 import cv2
-from cv2 import threshold
-from cv2 import THRESH_BINARY
 import numpy as np
-import defaults
+import json
+from calibration.agv_info import AgvInfo
+import calibration.camera_calibration as camera_calibration
+from defaults import CAMERA_NUMBER
+import positioning.positioning as pos
 
-from flask import Flask, render_template
-from flask.wrappers import Response
+from fastapi import FastAPI, HTTPException
+from json import JSONEncoder
 
-import detect
-import visualisation as viz
-from calibration.camera_calibration import calibrate_camera, undistort, is_calibrated
-from alignment.alignment import align
-from positioning.positioning import calculate_abs_distances_in_mm, get_data_and_position_points, pos_to_dict
+CURRENT_POSITION_MESSAGE = 'Current position'
+LAST_POSITION_MESSAGE = 'Last detected position. WARNING: the AGV might be somewhere else'
 
-from defaults import CALIBRATION_RESULTS_PATH, TOLERANCE, CAMERA_NUMBER, MARKER_TYPE, PARAMS_DIR, ALIGNMENT_TEMPLATE_IMG_PATH, STD_WAIT
-from calibration import agv_pattern, agv_info
-from segment import _threshold_img_adaptive, image_segments, masked_img #TODO remove protected method
+required_position = np.array([[140,  10], [768,  30], [745, 414], [132, 414]])
+current_position = np.array([[141,  12], [769,  32], [746, 416], [133, 416]])
 
-from exceptions import InvalidBarcodeException, TooFewPointsException
+agv_pool = OrderedDict({0: AgvInfo(560, 380, 200, 50, 50, 'default_agv')})
 
-app = Flask(__name__)
+camera = CAMERA_NUMBER
+cap = cv2.VideoCapture(camera)
 
-video = cv2.VideoCapture(CAMERA_NUMBER)
-position = None
-distances = None
-
-REQUIRED_POSITION = np.array([[141,  12], [769,  32], [746, 416], [133, 416]])
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-    
-def gen(video):
-    while True:
-        success, image = video.read()
-        ret, jpeg = cv2.imencode('.jpg', image)
-        frame = jpeg.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-               
-@app.route('/video_feed')
-def video_feed():
-    global video
-    return Response(gen(video),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/posiotion')
-def latest_position():
-    if position:
-        return pos_to_dict(position)
-    else:
-        return Response('Position could not be established', 500) #TODO should it be 404?
+app = FastAPI(title='AGV Positioning')
 
 
-@app.route('/distances')
-def latest_distances():
-    if distances:
-        return pos_to_dict(distances)
-    else:
-        return Response('Distances could not be measured', 500) #TODO should it be 404?
+@app.on_event('startup')
+async def main():
+    print('Welcome')
+    if not camera_calibration.is_calibrated():
+        return{'message': 'camera is being calibrated'}
+    return {'message': 'Welcome to AGV Positioning.'}
+
+@app.get('/')
+def welcome():
+    return {'message': 'Welcome to AGV Positioning'}
+
+@app.get('/distances/')
+def get_discances():
+    position_msg = get_position()
+    current = position_msg['is_current']  # TODO
+    position = ndarray_from_json(position_msg['position'])
+    length = position_msg['agv_length']
+    global required_position
+    x_dist, y_dist, _ = pos.calculate_distances_in_mm(position, required_position, length) #TODO
+
+    x_dist = ndarray_to_json(x_dist)
+    y_dist = ndarray_to_json(y_dist)
+
+    return {'message':'distances', 'is_current':current, 'x-distances': x_dist, 'y-distances': y_dist}
 
 
-@app.route('/calibrate')
-def calibrate():
-    calibrate_camera(with_video=True)
-    return 'Successfully calibrated'
+@app.get('/position/')
+def get_position():
+    success, img = cap.read()
+    if not success:
+        raise HTTPException(
+            status_code=500, detail='image could not be captured')
 
-@app.route('/set_current_pos_as_required')
-def set_current_pos_as_required():
-    #TODO
-    pass
-
-def main():
-
-    cap = cv2.VideoCapture(CAMERA_NUMBER)
-
-    force_recalibration = False
-    camera_calibrated = is_calibrated()
-
-    if not camera_calibrated or force_recalibration:
-        print('Calibrating camera ...')
-        calibrate_camera(with_video=False)
-        print('Calibration sucessful')
-
-    cam_mtx = np.load(f'{PARAMS_DIR}/calibration_matrix.npy')
-    dist_vecs = np.load(f'{PARAMS_DIR}/distortion_coefficients.npy')
-
-    template_image = cv2.imread(ALIGNMENT_TEMPLATE_IMG_PATH)
+    data, detected_position = pos.find_codes(img)
+    current = True
+    message = CURRENT_POSITION_MESSAGE
+    if detected_position == []:
+        current = False
+        message = LAST_POSITION_MESSAGE
+        length = get_last_agv().length
+        data = [get_last_agv()]
+    else :
+        length = json.loads(data[0])['length']
+        detected_position = np.array(detected_position)
+        global current_position
+        current_position = detected_position
 
 
-    while (cap.isOpened()):
-        success, img = cap.read()
-        old_img = img.copy()
+    current_position = pos.get_transformed_points(current_position, data[0])
 
-        if not success:
-            raise RuntimeError('Image capture unsuccessful')
-
-        #undistorted_img = undistort(img, cal_mtx, dist_mtx, alpha=0)
-
-        try: 
-            data, positions = get_data_and_position_points(img)# text and position of found codes
-        except InvalidBarcodeException:
-            positions = []
-            data = 'Invalid code'
+    return {'message': message, 'is_current': current, 'position': ndarray_to_json(current_position), 'agv_length':length}
 
 
-        #TODO aviod calculating points twice (maybe change discances function to accept points)
-        try:
-            distances = calculate_abs_distances_in_mm(positions, REQUIRED_POSITION, data[0])
-        except (TooFewPointsException, IndexError):
-            distances = np.ones((4))*999
-        except ValueError:
-            distances = np.ones((4))*999
-            cv2.imwrite('data/error_causing_images/value_error_when_assessing_distance.jpg', img)
-
-        # cv2.resize(img, (undistorted_img.shape[0], undistorted_img.shape[1]), dst=img)
-
-        position_box_color = (0, 0, 255)  # TODO
-        cv2.polylines(img, [REQUIRED_POSITION], isClosed=True, color=position_box_color)
-        viz.draw_points(img, np.array(positions)) #TODO find alternative (deprecated)
-            
-        cv2.putText(img, f'Decoded: {len(data)} codes', org=(100, 600), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=2, color=(0, 255, 0))
-
-        img_concat = np.concatenate((img, masked_img(img)), axis=0)
-        cv2.imshow('Aligned', img_concat)
-        print(data, positions)
-        print(distances)
-
-        pressed_key = cv2.waitKey(STD_WAIT) & 0xFF
-
-        if pressed_key == ord('s'):
-            cv2.imwrite('saved.jpg', old_img)
-        elif pressed_key == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
+@app.get('/position/last')
+def get_last_position():
+    return {'message': LAST_POSITION_MESSAGE, 'is_current': False, 'position': ndarray_to_json(current_position)}
 
 
+@app.put('/position/set_as_target/')
+def set_current_as_required():
+    global required_position
+    required_position = current_position
+    return {'message': 'new target set successfully'}
 
 
-if __name__ == '__main__':
-    #app.run()
-    main()
+@app.get('/target/')
+def get_target():
+    return ndarray_to_json(required_position)
+
+
+@app.get('/calibrate_camera/')
+def calibrate_camera():
+    camera_calibration.calibrate_camera(with_video=False)
+    return {'message': 'camera calibrated'}
+
+
+@app.get('/calibrate_camera/manual/')
+def calibrate_camera_manually():
+    camera_calibration.calibrate_camera(with_video=True)
+
+
+@app.get('/calibrate_camera/check_calibration_status/')
+def check_calibration_status():
+    result = camera_calibration.is_calibrated()
+    specifier = ''
+    if not result:
+        specifier = ' not '
+    return {'message': f'Camera is{specifier} calibrated', 'calibration_status': result}
+
+
+@app.get('/agv_info/')
+def get_agv_pool():
+    '''
+    returns all AGVs
+    '''
+    global agv_pool
+    return agv_pool
+
+
+@app.post('/agv_info/{id}/')
+def create_agv_info(id: int, length=560, width=380, height=200, raster_x=50, raster_y=50, serial_no='default_agv'):
+    '''
+    create an AGV at the specified index
+
+    example /agv_info/3/?length=560/?length=570&width?380&height=200&serial_no=example
+    '''
+    agv = AgvInfo(length, width, height, raster_x, raster_y, serial_no)
+    global agv_pool
+    agv_pool.update({id: agv})
+
+
+@app.put('/agv_info/{id}/')
+def change_agv_info(id: int, length=560, width=380, height=200, raster_x=50, raster_y=50, serial_no='default_agv'):
+    '''
+    update the AGV at the specified index position
+
+    example /agv_info/3/?length=560/?length=570&width?380&height=200&serial_no=example
+    '''
+    agv = AgvInfo(length, width, height, raster_x, raster_y, serial_no)
+    global agv_pool
+    agv_pool.update({id: agv})
+
+
+@app.get('/agv_info/{id}/')
+def get_agv_info(id: int):
+    '''
+    get an AGV from the pool at the specified index
+    '''
+    return agv_pool[id]
+
+
+@app.delete('/agv_info/{id}/')
+def delete_agv_info(id: int):
+    '''
+    delete an AGV from the pool
+    '''
+    del agv_pool[id]
+
+
+@app.put('/camera/{camera_no}/')
+def change_camera(camera_no: int):
+    '''
+    change the camera if you have more than one (default value is 0)
+    '''
+    global camera
+    camera = camera_no
+    return{'message': 'now using camera {camera_no}'}
+
+
+class NumpyArrayEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return JSONEncoder.default(self, obj)
+
+
+def ndarray_to_json(n):
+    encoded = json.dumps(n, cls=NumpyArrayEncoder)
+    return encoded
+
+
+def ndarray_from_json(j):
+    decoded = json.loads(j)
+    return np.asarray(decoded)
+
+def get_last_agv():
+    global agv_pool
+    last_agv = list(agv_pool.values())[-1]
+    return last_agv
