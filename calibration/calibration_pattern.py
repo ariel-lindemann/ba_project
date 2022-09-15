@@ -3,10 +3,7 @@ import numpy as np
 from calibration.agv_info import AgvInfo
 import calibration.pattern_utils as pattern_utils
 
-from math import sqrt
 from defaults import CALIBRATION_IMGS_PATH, CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y
-
-# TODO more elegant placement
 
 
 def create_pattern(agv_data: AgvInfo, img_shape=[2100, 2970], chessboard_corners=[CALIBRATION_CORNERS_X, CALIBRATION_CORNERS_Y], img_path=CALIBRATION_IMGS_PATH, write_file=True, code_type='qr'):

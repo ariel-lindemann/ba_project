@@ -48,7 +48,7 @@ def decode_agv_info(img, aruco=False):
     else:
 
         results = decode_single(img)
-        #TODO needs to be changed (single responsibility)
+
         # we need the raw data as well as agv
         data = [results.text]
         found = [results.position]
