@@ -36,7 +36,7 @@ def welcome():
     return {'message': 'Welcome to AGV Positioning'}
 
 @app.get('/distances/')
-def get_discances():
+def get_distances():
     '''
     Get the distance between the AGV's position (current or last known) and the target
     '''
