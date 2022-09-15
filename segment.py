@@ -8,7 +8,6 @@ from sklearn.cluster import DBSCAN
 THRESHOLD_BLOCK_SIZE = 51
 THRESHOLD_CONSTANT = 5
 
-#TODO dynamic size (based on code type)
 MIN_SEGMENT_AREA = 2500
 
 def image_segments(img, padding=25):
@@ -17,7 +16,7 @@ def image_segments(img, padding=25):
     '''
     # perform segmentation with downscaled img (faster)
     downscaled, scale = scale_to_size(img)
-    cnts_of_downscaled = _code_contours(downscaled)
+    cnts_of_downscaled = _code_contours(downscaled, scale)
     # use original image to get the segments
     # pass the scale to adjust the coordinates
     segments = _image_segments_by_contours(img, cnts_of_downscaled, scale, padding)
@@ -26,12 +25,12 @@ def image_segments(img, padding=25):
     return segments, positions
 
 
-def _code_contours(img, min_area=MIN_SEGMENT_AREA):
+def _code_contours(img, scale=1, min_area=MIN_SEGMENT_AREA):
     '''
     returns the contours of areas where codes could be 
     (only the contours, no hierarchies)
     '''
-    #TODO flexible parameters
+    min_area = min_area // scale
     mask = _threshold_img(img)
     contours = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
 
@@ -42,7 +41,6 @@ def _code_contours(img, min_area=MIN_SEGMENT_AREA):
 
 def _image_segments_by_contours(img, cnts, scale=1, padding=25):
     imgs = []
-    #TODO dynamic padding
     padding *= scale
 
     for c in cnts:
