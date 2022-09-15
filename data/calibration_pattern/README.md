@@ -1,0 +1,1 @@
+Print this pattern out and take the calibration images with it. Then save the images in `data/calibration_images/`
