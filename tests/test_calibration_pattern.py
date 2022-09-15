@@ -1,7 +1,8 @@
 import json
 import calibration.calibration_pattern as cal
 import os
-import zxingcpp as zx
+import detect
+import cv2
 from calibration.agv_info import AgvInfo
 from defaults import DATA_DIR, CALIBRATION_IMGS_FORMAT
 
@@ -27,12 +28,13 @@ def test_create_chess_board_correct_size():
 
 def test_pattern_is_created():
     img_path = 'tests/test_data/calibration_pattern.jpg'
-    create_pattern(img_path)
+    #create_pattern(img_path)
+    cv2.imwrite(img_path, cal.create_chess_board(9, 6, 100))
     assert os.path.exists(img_path)
 
 def test_pattern_correctness():
-    img = create_pattern(write_file=False)
-    data = zx.read_barcode(img).text
+    img = create_pattern(write_file=True)
+    data, _ = detect.find_codes(img)
     if not data:
         assert False, 'No data detected'
     else:

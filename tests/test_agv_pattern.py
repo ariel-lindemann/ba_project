@@ -1,6 +1,7 @@
 import calibration.agv_pattern as pat
 import os
 import json
+import detect
 import zxingcpp as zx
 from calibration.agv_info import AgvInfo
 
@@ -24,8 +25,7 @@ def test_agv_pattern_created():
 
 def test_agv_pattern_correct():
     img = create_pattern(write_file=False)
-    #TODO multiple detection
-    data = zx.read_barcode(img).text
+    data, _ = detect.find_codes(img)
     if not data:
         assert False, 'No data detected'
     for d in data:
