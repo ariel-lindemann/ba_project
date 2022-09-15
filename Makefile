@@ -1,12 +1,18 @@
 init:
-	pip3 install -r requirements.txt
+	pip install -r requirements.txt
 
 test:
-	python3 -m pytest
+	python -m pytest
 
 coverage:
-	python3 -m coverage run -m pytest
+	python -m coverage run -m pytest
 	coverage xml
 	coverage html
+
+run:
+	uvicorn main:app --reload
+
+run demo:
+	python main_demo.py
 
 .PHONY: init test
