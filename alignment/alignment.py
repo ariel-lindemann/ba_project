@@ -22,13 +22,12 @@ def find_pairs(img_points, template_points):
 
     if not img_points.any() : return pairs
 
-    # TODO shape
     # find corresponding pairs between image and template
     for img_point in img_points:
         marker_id = img_point[1]
         for t_point in template_points:
             if t_point[1]==marker_id:
-                pairs.concatenate(np.array([img_point[0], t_point[0]]))
+                pairs = np.concatenate(pairs, np.array([img_point[0], t_point[0]]))
                 np.delete(template_points, [t_point])
                 break 
 
