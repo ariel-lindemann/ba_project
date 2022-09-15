@@ -1,4 +1,3 @@
-# TODO move to different module?
 import cv2
 import cv2.aruco as aruco
 import numpy as np
@@ -43,7 +42,6 @@ def _create_template(corner_patterns, pattern_img_size=100, border=0, dpi=5, img
     length = round(length * SCALING_FACTOR)
     width = round(width * SCALING_FACTOR)
 
-    #TODO better name for variable `margin`
     # margin such that the corners of the square match the image corners
     margin = round(pattern_img_size * SCALING_FACTOR)
 
@@ -86,7 +84,7 @@ def create_agv_template(agv_info: AgvInfo, pattern_img_size=100, code_type='azte
 
     for c in corners:
         c_code = _create_corner_code(agv_info, c, code_type=code_type, size=round(
-            pattern_img_size * SCALING_FACTOR))  # TODO why 100?
+            pattern_img_size * SCALING_FACTOR)) 
         corner_codes.update([(c, c_code)])
 
     template = _create_template(corner_codes, pattern_img_size, border, dpi, img_path, write_file, agv_info.width, agv_info.length)
@@ -123,7 +121,6 @@ def create_aruco_template(marker_size, total_markers=250, pattern_img_size=100, 
         Should the file be written to disk
     '''
 
-    #TODO
     key = getattr(aruco, f'DICT_{marker_size}X{marker_size}_{total_markers}')
     aruco_dict = aruco.Dictionary_get(key)
 
@@ -138,3 +135,19 @@ def create_aruco_template(marker_size, total_markers=250, pattern_img_size=100, 
     template = _create_template(corner_markers, pattern_img_size, border, dpi, img_path, write_file, width, length)
 
     return template
+
+
+def create_aztec_runes_template(pattern_img_size=100, border=0, dpi=5, img_path=ALIGNMENT_TEMPLATE_IMG_PATH, write_file=True, width=380, length=560):
+    
+    SCALING_FACTOR = dpi * 3.9370079
+    corners = ['TL', 'TR', 'BL', 'BR']
+    corner_markers = {}
+
+    for c in corners:
+        c_code = create_code(c, round(pattern_img_size*SCALING_FACTOR))
+        corner_markers.update([(c, c_code)])
+
+    template = _create_template(corner_markers, pattern_img_size, border, dpi, img_path, write_file, width, length)
+
+    return template
+
