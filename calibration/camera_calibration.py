@@ -37,6 +37,9 @@ def calibrate_camera(with_video=True, imgs_path=CALIBRATION_IMGS_PATH, corners_x
     objpoints = []  # 3d point in real world space
     imgpoints = []  # 2d points in image plane.
     images = glob.glob(f'{imgs_path}/*.{CALIBRATION_IMGS_FORMAT}')
+
+    gray = np.zeros((0,0))
+
     for fname in images:
         img = cv2.imread(fname)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -86,13 +89,11 @@ def produce_calibration_images(amount=15, format=CALIBRATION_IMGS_FORMAT):
         img_with_text = img
         cv2.imshow('Calibration', img_with_text)
 
-        # TODO better condition
         if i%rate == 0:
             cv2.imwrite(f'{CALIBRATION_IMGS_PATH}/cal_img_{img_no}.{format}', img)
             print(f'Calibrating... {amount - img_no} more to go')
             img_no += 1
 
-# TODO fix
 def undistort(img, cal_mtx, dist, alpha=1.0):
     '''
     Reverse distortion based on intrinsic parameters
@@ -117,7 +118,8 @@ def undistort(img, cal_mtx, dist, alpha=1.0):
     h,  w = img.shape[:2]
     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(cal_mtx, dist, (w, h), alpha, (w, h))
 
-    undistorted = cv2.undistort(img, cal_mtx, dist, None, newcameramtx)
+    undistorted = np.zeros_like(img)
+    undistorted = cv2.undistort(img, cal_mtx, dist, undistorted, newcameramtx)
 
     # image is cropped
     x, y, w, h = roi
@@ -135,7 +137,6 @@ def calc_reprojection_err(objpoints, imgpoints, mtx, dist, rvecs, tvecs):
     print('total error: {}'.format(mean_error/len(objpoints)))
 
 
-# TODO check for names
 def is_calibrated():
     '''Checks if the camera is calibrated (if camera parameters are present)'''
     params_dir = os.listdir(PARAMS_DIR)
