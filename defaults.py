@@ -8,7 +8,7 @@ DEFAULT_MARKER_SIZE = 4
 # Positioning
 TOLERANCE = 0
 
-PROJECT_ROOT_DIR = '/Users/ariel/ba_project' #TODO change
+PROJECT_ROOT_DIR = '/Users/ariel/ba_project'
 DATA_DIR = f'{PROJECT_ROOT_DIR}/data'
 # Calibration
 PARAMS_DIR = f'{DATA_DIR}/camera_parameters'
