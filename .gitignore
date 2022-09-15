@@ -168,3 +168,8 @@ tests/test_data/*.png
 
 # Error causing images
 data/error_causing_images/*
+
+# Notebooks
+*.ipynb
+
+data/evaluation_vids/*
