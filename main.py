@@ -29,7 +29,7 @@ async def main():
     print('Welcome')
     if not camera_calibration.is_calibrated():
         return{'message': 'camera is being calibrated'}
-    return {'message': 'Welcome to AGV Positioning.'}
+    return {'message': 'Welcome to AGV Positioning'}
 
 @app.get('/')
 def welcome():
@@ -37,6 +37,9 @@ def welcome():
 
 @app.get('/distances/')
 def get_discances():
+    '''
+    Get the distance between the AGV's position (current or last known) and the target
+    '''
     position_msg = get_position()
     current = position_msg['is_current']  # TODO
     position = ndarray_from_json(position_msg['position'])
@@ -52,6 +55,9 @@ def get_discances():
 
 @app.get('/position/')
 def get_position():
+    '''
+    The current position of the AGV, if it can be detected. If not, then the last knows position is returned
+    '''
     success, img = cap.read()
     if not success:
         raise HTTPException(
@@ -79,11 +85,17 @@ def get_position():
 
 @app.get('/position/last')
 def get_last_position():
+    '''
+    The AGV's last known position. Use this if you don't expect the AGV to be located
+    '''
     return {'message': LAST_POSITION_MESSAGE, 'is_current': False, 'position': ndarray_to_json(current_position)}
 
 
 @app.put('/position/set_as_target/')
 def set_current_as_required():
+    '''
+    Set the AGV's current position as target. If the AGV can't be detected, the last known position will be chosen.
+    '''
     global required_position
     required_position = current_position
     return {'message': 'new target set successfully'}
@@ -91,6 +103,9 @@ def set_current_as_required():
 
 @app.get('/target/')
 def get_target():
+    '''
+    Get the target position
+    '''
     return ndarray_to_json(required_position)
 
 
