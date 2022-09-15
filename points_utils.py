@@ -29,6 +29,9 @@ def handle_too_few_points(points, data):
 
 
 def _sort_points(points):
+    '''
+    points must be ndarray
+    '''
     # sort points based on x coordinates
     sorted_x = points[np.argsort(points[:, 0]), :]
 
