@@ -12,7 +12,7 @@ coverage:
 run:
 	uvicorn main:app --reload
 
-run demo:
+demo:
 	python main_demo.py
 
 .PHONY: init test
